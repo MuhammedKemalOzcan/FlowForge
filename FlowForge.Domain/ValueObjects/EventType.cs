@@ -13,14 +13,15 @@ namespace FlowForge.Domain.ValueObjects
 
         public static EventType Create(string value)
         {
-            if (value.Length > 100)
-                throw new ArgumentException("Event Type cannot be longer than 100 characters.");
             if (string.IsNullOrEmpty(value))
                 throw new ArgumentException("Event type cannot be null");
+            if (value.Length > 100)
+                throw new ArgumentException("Event Type cannot be longer than 100 characters.");
+
             if (!IsValidFormat(value))
                 throw new ArgumentException("\"Event type must follow 'namespace.action' format (e.g., 'payment.succeeded').\"");
 
-            value = value.Trim();
+            value = value.Trim().ToLower();
 
             return new EventType(value);
         }

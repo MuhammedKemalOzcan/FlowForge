@@ -10,4 +10,10 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FlowForge.Application\FlowForge.Application.csproj" />
+    <ProjectReference Include="..\FlowForge.Infrastructure\FlowForge.Infrastructure.csproj" />
+    <ProjectReference Include="..\FlowForge.Persistence\FlowForge.Persistence.csproj" />
+  </ItemGroup>
+
 </Project>
