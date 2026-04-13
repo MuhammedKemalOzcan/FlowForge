@@ -30,11 +30,24 @@
 
         private static bool IsLocalOrPrivate(string host)
         {
+            if (host.StartsWith("172."))
+            {
+                var parts = host.Split('.');
+                if (parts.Length >= 2 && int.TryParse(parts[1], out var secondOctet))
+                {
+                    if (secondOctet >= 16 && secondOctet <= 31)
+                    {
+                        return true;
+                    }
+                }
+            }
+
             //SSRF protection (Localhost engelleme)
             return host is "localhost" or "127.0.0.1" or "0.0.0.0"
             || host.StartsWith("192.168.")
             || host.StartsWith("10.")
-            || host.StartsWith("172.");
+            || host.StartsWith("127.")
+            || host.StartsWith("169.254");
         }
     }
 }

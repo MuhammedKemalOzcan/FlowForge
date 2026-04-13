@@ -19,7 +19,7 @@ namespace FlowForge.Domain.ValueObjects
         //"Bu nesne her ne amaçla yazdırılmak istenirse istensin (log, debugger, UI), sakın içeriğini gösterme, sadece 'PROTECTED' yaz."
         public override string ToString() => "***PROTECTED***";
 
-        public static SigningSecret CreateNew()
+        public static SigningSecret Create()
         {
             var newValue = GenerateSecret();
             return new SigningSecret(newValue);

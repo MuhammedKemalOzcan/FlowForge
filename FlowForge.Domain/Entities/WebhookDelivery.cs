@@ -115,7 +115,7 @@ namespace FlowForge.Domain.Entities
             }
             else
             {
-                throw new ArgumentException($"Cannot mark as Succeeded from {Status} state. Only InProgress is allowed.");
+                throw new InvalidOperationException($"Cannot mark as Succeeded from {Status} state. Only InProgress is allowed.");
             }
         }
     }
