@@ -32,7 +32,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
         [InlineData(-1)]
         [InlineData(11)]
         [InlineData(150)]
-        public void Constructor_WithInvalidMaxAttempt_ThrowsArgumentException(int invalidMaxAttempts)
+        public void Constructor_WithInvalidMaxAttempt_ReturnsFailureResult(int invalidMaxAttempts)
         {
             //Act
             Action act = () => RetryPolicy.Create(
@@ -67,7 +67,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
         }
 
         [Fact]
-        public void Constructor_WithNegativeInitialDelay_ThrowsArgumentException()
+        public void Constructor_WithNegativeInitialDelay_ReturnsFailureResult()
         {
             //Arrange & Act
             Action act = () => RetryPolicy.Create(
@@ -83,7 +83,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
         }
 
         [Fact]
-        public void Constructor_WithMaxDelayLessThanInitialDelay_ThrowsArgumentException()
+        public void Constructor_WithMaxDelayLessThanInitialDelay_ReturnsFailureResult()
         {
             //Arrange & Act
             Action act = () => RetryPolicy.Create(
@@ -99,7 +99,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
         }
 
         [Fact]
-        public void Constructor_WithNegativeTimeout_ThrowsArgumentException()
+        public void Constructor_WithNegativeTimeout_ReturnsFailureResult()
         {
             //Arrange & Act
             Action act = () => RetryPolicy.Create(

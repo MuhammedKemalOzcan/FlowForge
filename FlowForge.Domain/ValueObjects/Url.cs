@@ -1,4 +1,6 @@
-﻿namespace FlowForge.Domain.ValueObjects
+﻿using FlowForge.Domain.Errors;
+
+namespace FlowForge.Domain.ValueObjects
 {
     public record Url
     {
@@ -10,22 +12,21 @@
             Value = value;
         }
 
-        public static Url Create(string value)
+        public static Result<Url> Create(string value)
         {
             if (string.IsNullOrEmpty(value))
-                throw new ArgumentException("Url cannot be empty!");
-
+                Result<Url>.Failure(DomainErrors.Url.Empty);
             //verilen string değeri url formatında mı.
             if (!Uri.TryCreate(value, UriKind.Absolute, out var uri))
-                throw new ArgumentException($"{value} is not a valid absolute URL.");
+                Result<Url>.Failure(DomainErrors.Url.InvalidUrl);
 
             if (uri.Scheme != "https")
-                throw new ArgumentException("URL must use HTTPS scheme.");
+                Result<Url>.Failure(DomainErrors.Url.InvalidScheme);
 
             if (IsLocalOrPrivate(uri.Host))
-                throw new ArgumentException("URL cannot point to local or private addresses.");
+                Result<Url>.Failure(DomainErrors.Url.LocalUrl);
 
-            return new Url(uri.ToString());
+            return Result<Url>.Success(new Url(uri.ToString()));
         }
 
         private static bool IsLocalOrPrivate(string host)

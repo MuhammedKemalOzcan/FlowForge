@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using FlowForge.Domain.Errors;
+using System.Text.RegularExpressions;
 
 namespace FlowForge.Domain.ValueObjects
 {
@@ -11,19 +12,18 @@ namespace FlowForge.Domain.ValueObjects
             Value = value;
         }
 
-        public static EventType Create(string value)
+        public static Result<EventType> Create(string value)
         {
             if (string.IsNullOrEmpty(value))
-                throw new ArgumentException("Event type cannot be null");
+                return Result<EventType>.Failure(DomainErrors.EventType.Empty);
             if (value.Length > 100)
-                throw new ArgumentException("Event Type cannot be longer than 100 characters.");
-
+                return Result<EventType>.Failure(DomainErrors.EventType.TooLong);
             if (!IsValidFormat(value))
-                throw new ArgumentException("\"Event type must follow 'namespace.action' format (e.g., 'payment.succeeded').\"");
+                return Result<EventType>.Failure(DomainErrors.EventType.InvalidFormat);
 
             value = value.Trim().ToLower();
 
-            return new EventType(value);
+            return Result<EventType>.Success(new EventType(value));
         }
 
         //namespace.action kontrolü

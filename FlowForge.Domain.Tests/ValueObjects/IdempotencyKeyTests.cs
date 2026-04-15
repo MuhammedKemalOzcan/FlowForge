@@ -40,7 +40,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
         [InlineData("   ")]
         [InlineData("\t")]
         [InlineData("\n")]
-        public void Create_WithNullOrWhitespaceKey_ThrowsArgumentException(string validKeys)
+        public void Create_WithNullOrWhitespaceKey_ReturnsFailureResult(string validKeys)
         {
             //Act
             Action act = () => IdempotencyKey.Create(validKeys);
@@ -50,7 +50,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
         }
 
         [Fact]
-        public void Create_WithKeyLongerThan255Chars_ThrowsArgumentException()
+        public void Create_WithKeyLongerThan255Chars_ReturnsFailureResult()
         {
             //Arrange
             var input = new string('a', 256);
@@ -80,7 +80,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
         [InlineData("türkçe_key")]
         [InlineData("key\u0001invisible")]
         [InlineData("key\u007Fdel")]
-        public void Create_WithNonAsciiCharacters_ThrowsArgumentException(string invalidInputs)
+        public void Create_WithNonAsciiCharacters_ReturnsFailureResult(string invalidInputs)
         {
             //Act
             Action act = () => IdempotencyKey.Create(invalidInputs);

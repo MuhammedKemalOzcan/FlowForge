@@ -1,4 +1,6 @@
-﻿namespace FlowForge.Domain.ValueObjects
+﻿using FlowForge.Domain.Errors;
+
+namespace FlowForge.Domain.ValueObjects
 {
     public record IdempotencyKey
     {
@@ -9,16 +11,16 @@
             Value = value;
         }
 
-        public static IdempotencyKey Create(string value)
+        public static Result<IdempotencyKey> Create(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Idempotency key value cannot be empty");
+                return Result<IdempotencyKey>.Failure(DomainErrors.IdempotencyKey.Empty);
             if (value.Length < 1 || value.Length > 255)
-                throw new ArgumentException("Value must between 1 and 255 characters");
+                return Result<IdempotencyKey>.Failure(DomainErrors.IdempotencyKey.InvalidLength);
             if (!value.All(x => x >= 32 && x <= 126))
-                throw new ArgumentException("Value must be ASCII printable");
+                return Result<IdempotencyKey>.Failure(DomainErrors.IdempotencyKey.InvalidFormat);
 
-            return new IdempotencyKey(value);
+            return Result<IdempotencyKey>.Success(new IdempotencyKey(value));
         }
     }
 }

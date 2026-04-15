@@ -42,7 +42,7 @@ namespace FlowForge.Domain.Tests.Entities
         }
 
         [Fact]
-        public void Create_WithEmptyTenantId_ThrowsArgumentException()
+        public void Create_WithEmptyTenantId_ReturnsFailureResult()
         {
             //Arrange
             var tenantId = Guid.Empty;
@@ -62,7 +62,7 @@ namespace FlowForge.Domain.Tests.Entities
         }
 
         [Fact]
-        public void Create_WithEmptyEndPoint_ThrowsArgumentException()
+        public void Create_WithEmptyEndPoint_ReturnsFailureResult()
         {
             //Arrange
             var tenantId = Guid.NewGuid();
@@ -80,7 +80,7 @@ namespace FlowForge.Domain.Tests.Entities
         }
 
         [Fact]
-        public void Create_WithEmptyEventType_ThrowsArgumentException()
+        public void Create_WithEmptyEventType_ReturnsFailureResult()
         {
             //Arrange
             var tenantId = Guid.NewGuid();
@@ -98,7 +98,7 @@ namespace FlowForge.Domain.Tests.Entities
         }
 
         [Fact]
-        public void Create_WithNullOrEmptyPayload_ThrowsArgumentException()
+        public void Create_WithNullOrEmptyPayload_ReturnsFailureResult()
         {
             //Arrange
             var tenantId = Guid.NewGuid();
@@ -116,7 +116,7 @@ namespace FlowForge.Domain.Tests.Entities
         }
 
         [Fact]
-        public void Create_WithNullIdempotencyKey_ThrowsArgumentException()
+        public void Create_WithNullIdempotencyKey_ReturnsFailureResult()
         {
             //Arrange
             var tenantId = Guid.NewGuid();
@@ -134,7 +134,7 @@ namespace FlowForge.Domain.Tests.Entities
         }
 
         [Fact]
-        public void Create_WithNullRetryPolicy_ThrowsArgumentException()
+        public void Create_WithNullRetryPolicy_ReturnsFailureResult()
         {
             //Arrange
             var tenantId = Guid.NewGuid();
