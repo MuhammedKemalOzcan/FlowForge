@@ -1,4 +1,6 @@
-﻿using FlowForge.Domain.ValueObjects;
+﻿using FlowForge.Domain.Enums;
+using FlowForge.Domain.Errors;
+using FlowForge.Domain.ValueObjects;
 using FluentAssertions;
 
 namespace FlowForge.Domain.Tests.ValueObjects
@@ -15,75 +17,83 @@ namespace FlowForge.Domain.Tests.ValueObjects
         public void Create_WithValidFormat_ReturnsInstance(string inputs)
         {
             //Act
-            var eventType = EventType.Create(inputs);
+            var result = EventType.Create(inputs);
 
             //Assert
-            eventType.Should().NotBeNull();
-            eventType.Value.Should().Be(inputs);
+            result.IsSuccess.Should().BeTrue();
+            result.Data.Should().NotBeNull();
+            result.Data.Value.Should().Be(inputs);
         }
 
         [Theory]
         [InlineData("paymentsucceeded")]
         [InlineData("order")]
-        public void Create_WithoutDotSeperator_ThrowsArgumentException(string inputs)
+        public void Create_WithoutDotSeperator_ReturnsFailureResult(string inputs)
         {
             //Act
-            Action act = () => EventType.Create(inputs);
+            var result = EventType.Create(inputs!);
 
             //Assert
-            act.Should().Throw<ArgumentException>().WithMessage("*format*");
+            result.IsSuccess.Should().BeFalse();
+            result.Error.Should().Be(DomainErrors.EventType.InvalidFormat);
         }
 
         [Theory]
         [InlineData("Payment.succeeded")]
         [InlineData("PAYMENT.SUCCEEDED")]
         [InlineData("payment.Succeeded")]
-        public void Create_WithUppercaseLetters_ThrowsArgumentException(string inputs)
+        public void Create_WithUppercaseLetters_ReturnsFailureResult(string inputs)
         {
             //Act
-            Action act = () => EventType.Create(inputs);
+            var result = EventType.Create(inputs!);
 
             //Assert
-            act.Should().Throw<ArgumentException>().WithMessage("*format*");
+            result.IsSuccess.Should().BeFalse();
+            result.Error.Should().Be(DomainErrors.EventType.InvalidFormat);
         }
 
         [Theory]
         [InlineData("Payment-succeeded")]
         [InlineData("payment/succeded")]
         [InlineData("payment@succeeded")]
-        public void Create_WithInvalidCharacters_ThrowsArgumentException(string inputs)
+        public void Create_WithInvalidCharacters_ReturnsFailureResult(string inputs)
         {
             //Act
-            Action act = () => EventType.Create(inputs);
+            var result = EventType.Create(inputs!);
 
             //Assert
-            act.Should().Throw<ArgumentException>().WithMessage("*format*");
+            result.IsSuccess.Should().BeFalse();
+            result.Error.Should().Be(DomainErrors.EventType.InvalidFormat);
         }
 
         [Theory]
         [InlineData(null)]
         [InlineData(" ")]
         [InlineData("")]
-        public void Create_WithnullOrWihtespace_ThrowsArgumentException(string? inputs)
+        public void Create_WithNullOrWhitespace_ReturnsFailureResult(string? inputs)
         {
             //Act
-            Action act = () => EventType.Create(inputs!);
+            var result = EventType.Create(inputs!);
 
             //Assert
-            act.Should().Throw<ArgumentException>();
+            result.IsSuccess.Should().BeFalse();
+            result.Error.Should().NotBeNull();
+            result.Error.Code.Should().Be("EventType.Invalid");
+            result.Error.ErrorType.Should().Be(ErrorType.Validation);
         }
 
         [Fact]
-        public void Create_WithValueLongerThan100Chars_ThrowsArgumentException()
+        public void Create_WithValueLongerThan100Chars_ReturnsFailureResult()
         {
             //Arrange
             var input = "a." + new string('b', 99);
 
             //Act
-            Action act = () => EventType.Create(input);
+            var result = EventType.Create(input);
 
             //Assert
-            act.Should().Throw<ArgumentException>();
+            result.IsSuccess.Should().BeFalse();
+            result.Error.Should().Be(DomainErrors.EventType.TooLong);
         }
 
         [Fact]
@@ -97,7 +107,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
 
             //Arrange
             eventType.Should().NotBeNull();
-            eventType.Value.Should().Be(input);
+            eventType.Data.Value.Should().Be(input);
         }
     }
 }

@@ -36,7 +36,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
         }
 
         [Fact]
-        public void Constructor_WithNullUrl_ThrowsArgumentException()
+        public void Constructor_WithNullUrl_ReturnsFailureResult()
         {
             //Act
             Action act = () => Url.Create(null!);
@@ -50,7 +50,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
         [InlineData("  ")]
         [InlineData("\n")]
         [InlineData("\t")]
-        public void Constructor_WithEmptyUrl_ThrowsArgumentException(string invalidUrl)
+        public void Constructor_WithEmptyUrl_ReturnsFailureResult(string invalidUrl)
         {
             //Act
             Action act = () => Url.Create(invalidUrl);
@@ -64,7 +64,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
         [InlineData("test")]
         [InlineData("htppsssss://test")]
         [InlineData("://test")]
-        public void Constructor_WithMalformedUrl_ThrowsArgumentException(string invalidUrl)
+        public void Constructor_WithMalformedUrl_ReturnsFailureResult(string invalidUrl)
         {
             //Act
             Action act = () => Url.Create(invalidUrl);
@@ -77,7 +77,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
         [InlineData("/path/only")]
         [InlineData("relative/path")]
         [InlineData("//cdn.example.com/path")]  // protocol-relative
-        public void Constructor_WithRelativeUrl_ThrowsArgumentException(string relativeUrl)
+        public void Constructor_WithRelativeUrl_ReturnsFailureResult(string relativeUrl)
         {
             // Act
             Action act = () => Url.Create(relativeUrl);
@@ -87,7 +87,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
         }
 
         [Fact]
-        public void Constructor_WithHttpUrl_ThrowsArgumentException()
+        public void Constructor_WithHttpUrl_ReturnsFailureResult()
         {
             //Arrange
             var httpUrl = "http://example.com/test";
@@ -107,7 +107,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
         [InlineData("data:text/plain;base64,SGVsbG8=")]
         [InlineData("javascript:alert(1)")]  // XSS vektörü
         [InlineData("gopher://example.com")]
-        public void Constructor_WithNonHttpsScheme_ThrowsArgumentException(string url)
+        public void Constructor_WithNonHttpsScheme_ReturnsFailureResult(string url)
         {
             // Act
             Action act = () => Url.Create(url);
@@ -120,7 +120,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
         [InlineData("https://localhost/webhook")]
         [InlineData("https://localhost:8080/webhook")]
         [InlineData("https://LOCALHOST/webhook")]  // case sensitivity
-        public void Constructor_WithLocalhostHostname_ThrowsArgumentException(string localhostUrl)
+        public void Constructor_WithLocalhostHostname_ReturnsFailureResult(string localhostUrl)
         {
             // Act
             Action act = () => Url.Create(localhostUrl);
@@ -134,7 +134,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
         [InlineData("https://127.0.0.1:8080/webhook")]
         [InlineData("https://127.1.2.3/webhook")]  // 127.x range tamamı
         [InlineData("https://127.255.255.254/webhook")]
-        public void Constructor_WithIPv4LocalhostRange_ThrowsArgumentException(string localhostUrl)
+        public void Constructor_WithIPv4LocalhostRange_ReturnsFailureResult(string localhostUrl)
         {
             // Act
             Action act = () => Url.Create(localhostUrl);
@@ -151,7 +151,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
         [InlineData("https://172.16.0.1/webhook")]   // 172.16-31 başı
         [InlineData("https://172.31.255.254/webhook")]  // 172.16-31 sonu
         [InlineData("https://172.20.1.1/webhook")]   // ortası
-        public void Constructor_WithPrivateIpAddress_ThrowsArgumentException(string privateIpUrl)
+        public void Constructor_WithPrivateIpAddress_ReturnsFailureResult(string privateIpUrl)
         {
             // Act
             Action act = () => Url.Create(privateIpUrl);
@@ -177,7 +177,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
         [InlineData("https://169.254.169.254/latest/meta-data/")]
         [InlineData("https://169.254.169.254/")]
         [InlineData("https://169.254.1.1/webhook")]  // 169.254.x tamamı
-        public void Constructor_WithAwsMetadataIp_ThrowsArgumentException(string metadataUrl)
+        public void Constructor_WithAwsMetadataIp_ReturnsFailureResult(string metadataUrl)
         {
             // Act
             Action act = () => Url.Create(metadataUrl);
@@ -189,7 +189,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
         [Theory]
         [InlineData("https://0.0.0.0/webhook")]
         [InlineData("https://0.0.0.0:8080/webhook")]
-        public void Constructor_WithUnspecifiedAddress_ThrowsArgumentException(string url)
+        public void Constructor_WithUnspecifiedAddress_ReturnsFailureResult(string url)
         {
             // Act
             Action act = () => Url.Create(url);

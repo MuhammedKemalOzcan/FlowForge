@@ -1,4 +1,5 @@
 ﻿using FlowForge.Domain.Enums;
+using FlowForge.Domain.Errors;
 
 namespace FlowForge.Domain.ValueObjects
 {
@@ -20,18 +21,18 @@ namespace FlowForge.Domain.ValueObjects
             TimeOut = timeout;
         }
 
-        public static RetryPolicy Create(int maxAttempt, BackoffStrategy strategy, TimeSpan initialDelay, TimeSpan maxDelay, TimeSpan timeout)
+        public static Result<RetryPolicy> Create(int maxAttempt, BackoffStrategy strategy, TimeSpan initialDelay, TimeSpan maxDelay, TimeSpan timeout)
         {
             if (maxAttempt < 1 || maxAttempt > 10)
-                throw new ArgumentException("Max attempts must be between 1 and 10");
+                return Result<RetryPolicy>.Failure(DomainErrors.RetryPolicy.InvalidMaxAttemptRange);
             if (initialDelay < TimeSpan.Zero)
-                throw new ArgumentException("Initial delay cannot be nagative");
+                return Result<RetryPolicy>.Failure(DomainErrors.RetryPolicy.NegativeInitialDelay);
             if (maxDelay < initialDelay)
-                throw new ArgumentException("MaxDelay must be >= InitialDelay.");
+                return Result<RetryPolicy>.Failure(DomainErrors.RetryPolicy.InvalidDelayRange);
             if (timeout <= TimeSpan.Zero)
-                throw new ArgumentException("timeout must be positive");
+                return Result<RetryPolicy>.Failure(DomainErrors.RetryPolicy.NegativeTimeout);
 
-            return new RetryPolicy(maxAttempt, strategy, initialDelay, maxDelay, timeout);
+            return Result<RetryPolicy>.Success(new RetryPolicy(maxAttempt, strategy, initialDelay, maxDelay, timeout));
         }
 
         public static RetryPolicy Default() => new(
@@ -45,7 +46,7 @@ namespace FlowForge.Domain.ValueObjects
         public TimeSpan CalculateDelayFor(int attemptNumber)
         {
             if (attemptNumber < 1 || attemptNumber > MaxAttempts)
-                throw new ArgumentOutOfRangeException(nameof(attemptNumber));
+                throw new ArgumentOutOfRangeException(nameof(attemptNumber), $"Attempt number must be between 1 and {MaxAttempts}.");
 
             var delay = Strategy switch
             {
