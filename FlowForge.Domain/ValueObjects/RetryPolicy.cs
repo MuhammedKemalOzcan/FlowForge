@@ -5,11 +5,11 @@ namespace FlowForge.Domain.ValueObjects
 {
     public record RetryPolicy
     {
-        public int MaxAttempts { get; init; }
-        public BackoffStrategy Strategy { get; init; }
-        public TimeSpan InitialDelay { get; init; }
-        public TimeSpan MaxDelay { get; init; }
-        public TimeSpan TimeOut { get; init; }
+        public int MaxAttempts { get; private set; }
+        public BackoffStrategy Strategy { get; private set; }
+        public TimeSpan InitialDelay { get; private set; }
+        public TimeSpan MaxDelay { get; private set; }
+        public TimeSpan TimeOut { get; private set; }
 
         private RetryPolicy(int maxAttempt, BackoffStrategy strategy, TimeSpan initialDelay, TimeSpan maxDelay, TimeSpan timeout)
         {

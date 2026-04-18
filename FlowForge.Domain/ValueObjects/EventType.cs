@@ -5,7 +5,7 @@ namespace FlowForge.Domain.ValueObjects
 {
     public record EventType
     {
-        public string Value { get; init; }
+        public string Value { get; private set; }
 
         private EventType(string value)
         {

@@ -21,6 +21,9 @@ namespace FlowForge.Domain.Entities
 
         internal DeliveryAttempt(int attemptNumber, long durationMs, HttpStatusCode? statusCode, string? responseBodySnippet, string? errorMessage, DateTime startedAt, DateTime completedAt, OutcomeStatus outcomeStatus)
         {
+            if (attemptNumber < 1) throw new ArgumentException("Attempt number cannot be below 1!");
+            if (durationMs < 0) throw new ArgumentException("Duration cannot be negative!");
+
             AttemptNumber = attemptNumber;
             StartedAt = startedAt;
             CompletedAt = completedAt;

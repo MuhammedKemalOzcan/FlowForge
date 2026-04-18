@@ -5,7 +5,7 @@ namespace FlowForge.Domain.ValueObjects
 {
     public record SigningSecret
     {
-        internal string Value { get; init; }
+        internal string Value { get; private set; }
 
         private SigningSecret(string value)
         {
@@ -30,11 +30,7 @@ namespace FlowForge.Domain.ValueObjects
             //Ram'de 32 bytle'lık boş bir array tanımlanır.
             byte[] randomBytes = new byte[keyBytes];
 
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                //Bu 32 byte'lık diziye rastgele sayıları yerleştirir.
-                rng.GetBytes(randomBytes);
-            }
+            RandomNumberGenerator.Fill(randomBytes);
 
             return Convert.ToBase64String(randomBytes);
         }

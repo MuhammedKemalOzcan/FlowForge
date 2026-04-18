@@ -17,4 +17,20 @@
 
         public static Result<T> Failure(Error error) => new(false, default, error);
     }
+
+    public class Result
+    {
+        public bool IsSuccess { get; private set; }
+        public Error Error { get; private set; }
+
+        private Result(bool isSuccess, Error error)
+        {
+            IsSuccess = isSuccess;
+            Error = error;
+        }
+
+        public static Result Success() => new(true, Error.None);
+
+        public static Result Failure(Error error) => new(false, error);
+    }
 }
