@@ -4,7 +4,7 @@ namespace FlowForge.Domain.ValueObjects
 {
     public record IdempotencyKey
     {
-        public string Value { get; init; }
+        public string Value { get; private set; }
 
         private IdempotencyKey(string value)
         {
@@ -17,6 +17,7 @@ namespace FlowForge.Domain.ValueObjects
                 return Result<IdempotencyKey>.Failure(DomainErrors.IdempotencyKey.Empty);
             if (value.Length < 1 || value.Length > 255)
                 return Result<IdempotencyKey>.Failure(DomainErrors.IdempotencyKey.InvalidLength);
+            //Http header'da taşınabilir karakterleri sınırlandırdık.(ASCII printable)
             if (!value.All(x => x >= 32 && x <= 126))
                 return Result<IdempotencyKey>.Failure(DomainErrors.IdempotencyKey.InvalidFormat);
 

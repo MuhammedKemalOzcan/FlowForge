@@ -33,10 +33,39 @@
             public static Error AttemptOutOfRange => Error.Validation("RetryPolicy.AttemptOutOfRange", "Attempt number must be between 1 and 10");
         }
 
-        public static class WebhookDelivery
+        public static class EndpointName
         {
-            public static Error TenantNotFound => Error.NotFound("WebhookDelivery.TenantNotFound", "Tenant cannot be found");
-            public static Error EndpointNotFound => Error.NotFound("WebhookDelivery.EndpointNotFound", "Endpoint cannot be found");
+            public static Error NameEmpty => Error.Validation("EndpointName.NameEmpty", "Name cannot be empty.");
+            public static Error InvalidNameLength => Error.Validation("EndpointName.InvalidNameLength", "Name must be between 2 and 100 characters.");
+        }
+
+        public static class WebhookEndpoint
+        {
+            public static Error AlreadyDeactivated => Error.Conflict("WebhookEndpoint.AlreadyDeactivated", "The webhook endpoint is already deactivated.");
+        }
+
+        public static class ExternalIdentityId
+        {
+            public static Error Empty => Error.Validation("ExternalIdentityId.Empty", "External identity ID cannot be empty.");
+        }
+
+        public static class ApiKey
+        {
+            public static Error AlreadyRevoked => Error.Validation("ApiKey.AlreadyRevoked", "This key is already revoked cannot be revoked again.");
+        }
+
+        public static class Email
+        {
+            public static Error InvalidEmailFormat => Error.Validation("Email.InvalidEmailFormat", "Invalid Email format!");
+            public static Error Empty => Error.Validation("Email.Empty", "Email cannot be empty.");
+        }
+
+        public static class Tenant
+        {
+            public static Error ReachedMaxMember => Error.LimitExceeded("Tenant.ReachedMaxMember", "Max number of members has been reached.");
+            public static Error MemberAlreadyExist => Error.Conflict("Tenant.MemberAlreadyExist", "This user is already a member.");
+            public static Error MemberCannotFound => Error.NotFound("Tenant.MemberCannotFound", "This user is not a member.");
+            public static Error OwnerCannotBeRemoved => Error.Forbidden("Tenant.OwnerCannotBeRemoved", "Owner cannot be removed.");
         }
     }
 }

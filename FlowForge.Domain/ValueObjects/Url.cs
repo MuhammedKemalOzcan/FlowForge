@@ -4,7 +4,7 @@ namespace FlowForge.Domain.ValueObjects
 {
     public record Url
     {
-        public string Value { get; }
+        public string Value { get; private set; }
 
         private Url(string value)
         {
@@ -15,16 +15,16 @@ namespace FlowForge.Domain.ValueObjects
         public static Result<Url> Create(string value)
         {
             if (string.IsNullOrEmpty(value))
-                Result<Url>.Failure(DomainErrors.Url.Empty);
+                return Result<Url>.Failure(DomainErrors.Url.Empty);
             //verilen string değeri url formatında mı.
             if (!Uri.TryCreate(value, UriKind.Absolute, out var uri))
-                Result<Url>.Failure(DomainErrors.Url.InvalidUrl);
+                return Result<Url>.Failure(DomainErrors.Url.InvalidUrl);
 
             if (uri.Scheme != "https")
-                Result<Url>.Failure(DomainErrors.Url.InvalidScheme);
+                return Result<Url>.Failure(DomainErrors.Url.InvalidScheme);
 
             if (IsLocalOrPrivate(uri.Host))
-                Result<Url>.Failure(DomainErrors.Url.LocalUrl);
+                return Result<Url>.Failure(DomainErrors.Url.LocalUrl);
 
             return Result<Url>.Success(new Url(uri.ToString()));
         }
