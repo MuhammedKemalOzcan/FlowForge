@@ -6,6 +6,8 @@ namespace FlowForge.Domain.ValueObjects
     public record HashedApiKey
     {
         public string Value { get; private set; }
+
+        private HashedApiKey() { }
         private HashedApiKey(string value)
         {
             if (string.IsNullOrEmpty(value)) throw new ArgumentException("Hashed API Key cannot be empty.");

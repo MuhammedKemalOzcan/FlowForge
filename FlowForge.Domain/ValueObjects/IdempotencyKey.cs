@@ -6,6 +6,8 @@ namespace FlowForge.Domain.ValueObjects
     {
         public string Value { get; private set; }
 
+        private IdempotencyKey() { }
+
         private IdempotencyKey(string value)
         {
             Value = value;

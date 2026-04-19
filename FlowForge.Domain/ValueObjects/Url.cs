@@ -6,6 +6,8 @@ namespace FlowForge.Domain.ValueObjects
     {
         public string Value { get; private set; }
 
+        private Url() { }
+
         private Url(string value)
         {
             //Value = uri.ToString();

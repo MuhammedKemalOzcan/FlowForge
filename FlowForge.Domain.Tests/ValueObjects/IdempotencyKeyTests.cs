@@ -16,7 +16,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
 
             //Assert
             idempotencyKey.Should().NotBeNull();
-            idempotencyKey.Value.Should().Be(validKey);
+            idempotencyKey.Data.Value.Should().Be(validKey);
         }
 
         [Theory]

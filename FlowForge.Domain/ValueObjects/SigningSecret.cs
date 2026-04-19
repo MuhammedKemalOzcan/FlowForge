@@ -7,6 +7,8 @@ namespace FlowForge.Domain.ValueObjects
     {
         internal string Value { get; private set; }
 
+        private SigningSecret() { }
+
         private SigningSecret(string value)
         {
             if (string.IsNullOrEmpty(value))

@@ -20,11 +20,11 @@ namespace FlowForge.Domain.Tests.ValueObjects
                 );
 
             //Assert
-            retryPolicy.MaxAttempts.Should().Be(5);
-            retryPolicy.Strategy.Should().Be(Enums.BackoffStrategy.Exponential);
-            retryPolicy.InitialDelay.Should().Be(TimeSpan.FromSeconds(1));
-            retryPolicy.MaxDelay.Should().Be(TimeSpan.FromMinutes(5));
-            retryPolicy.TimeOut.Should().Be(TimeSpan.FromSeconds(10));
+            retryPolicy.Data.MaxAttempts.Should().Be(5);
+            retryPolicy.Data.Strategy.Should().Be(Enums.BackoffStrategy.Exponential);
+            retryPolicy.Data.InitialDelay.Should().Be(TimeSpan.FromSeconds(1));
+            retryPolicy.Data.MaxDelay.Should().Be(TimeSpan.FromMinutes(5));
+            retryPolicy.Data.TimeOut.Should().Be(TimeSpan.FromSeconds(10));
         }
 
         [Theory]
@@ -148,7 +148,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
                 timeout: TimeSpan.FromSeconds(30)
             );
 
-            var delay = policy.CalculateDelayFor(attemptNumber);
+            var delay = policy.Data.CalculateDelayFor(attemptNumber);
 
             //Assert
             delay.Should().Be(TimeSpan.FromSeconds(expectedSeconds));
@@ -168,7 +168,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
 
             // Act - 10. attempt için 1 * 2^9 = 512 saniye hesaplanacak
             // Ama MaxDelay=5s olduğu için 5 saniye dönmeli
-            var delay = policy.CalculateDelayFor(10);
+            var delay = policy.Data.CalculateDelayFor(10);
 
             // Assert
             delay.Should().Be(TimeSpan.FromSeconds(5));
@@ -193,7 +193,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
             );
 
             // Act
-            var delay = policy.CalculateDelayFor(attemptNumber);
+            var delay = policy.Data.CalculateDelayFor(attemptNumber);
 
             // Assert
             delay.Should().Be(TimeSpan.FromSeconds(expectedSeconds));
@@ -215,7 +215,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
             );
 
             // Act
-            var delay = policy.CalculateDelayFor(attemptNumber);
+            var delay = policy.Data.CalculateDelayFor(attemptNumber);
 
             // Assert
             delay.Should().Be(TimeSpan.FromSeconds(3));
@@ -239,7 +239,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
             );
 
             // Act
-            Action act = () => policy.CalculateDelayFor(invalidAttempt);
+            Action act = () => policy.Data.CalculateDelayFor(invalidAttempt);
 
             // Assert
             act.Should().Throw<ArgumentOutOfRangeException>();
@@ -259,7 +259,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
             );
 
             //Assert
-            policy.IsLastAttempt(5).Should().Be(true);
+            policy.Data.IsLastAttempt(5).Should().Be(true);
         }
 
         [Theory]
@@ -278,7 +278,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
             );
 
             //Assert
-            policy.IsLastAttempt(attemptNumber).Should().Be(false);
+            policy.Data.IsLastAttempt(attemptNumber).Should().Be(false);
         }
 
         [Fact]
@@ -294,7 +294,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
             );
 
             //Assert
-            policy.IsLastAttempt(6).Should().Be(true);
+            policy.Data.IsLastAttempt(6).Should().Be(true);
         }
     }
 }
