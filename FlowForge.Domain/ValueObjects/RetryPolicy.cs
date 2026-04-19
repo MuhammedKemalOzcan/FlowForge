@@ -11,6 +11,8 @@ namespace FlowForge.Domain.ValueObjects
         public TimeSpan MaxDelay { get; private set; }
         public TimeSpan TimeOut { get; private set; }
 
+        private RetryPolicy() { }
+
         private RetryPolicy(int maxAttempt, BackoffStrategy strategy, TimeSpan initialDelay, TimeSpan maxDelay, TimeSpan timeout)
         {
             MaxAttempts = maxAttempt;

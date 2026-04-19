@@ -6,6 +6,8 @@ namespace FlowForge.Domain.Entities
     public class DeliveryAttempt
     {
         //Webhook içerisinde yaşayan entity.
+        public Guid Id { get; private set; }
+
         public int AttemptNumber { get; private set; }
 
         public DateTime StartedAt { get; private set; }
@@ -24,6 +26,7 @@ namespace FlowForge.Domain.Entities
             if (attemptNumber < 1) throw new ArgumentException("Attempt number cannot be below 1!");
             if (durationMs < 0) throw new ArgumentException("Duration cannot be negative!");
 
+            Id = Guid.NewGuid();
             AttemptNumber = attemptNumber;
             StartedAt = startedAt;
             CompletedAt = completedAt;

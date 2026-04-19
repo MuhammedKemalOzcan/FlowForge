@@ -17,7 +17,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
 
             //Assert
             url.Should().NotBeNull();
-            url.Value.Should().Be(validUrl);
+            url.Data.Value.Should().Be(validUrl);
         }
 
         [Theory]

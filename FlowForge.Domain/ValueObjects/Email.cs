@@ -6,6 +6,7 @@ namespace FlowForge.Domain.ValueObjects
     {
         public string Value { get; private set; }
 
+        private Email() { }
         private Email(string value)
         {
             Value = value;

@@ -6,6 +6,9 @@ namespace FlowForge.Domain.ValueObjects
     {
         public string ExternalId { get; private set; }
 
+        private ExternalIdentityId()
+        {
+        }
         private ExternalIdentityId(string id)
         {
             ExternalId = id;

@@ -14,9 +14,9 @@ namespace FlowForge.Domain.Tests.Entities
             //Arrange
             var tenantId = Guid.NewGuid();
             var endpointId = Guid.NewGuid();
-            var eventType = EventType.Create("payment.succeeded");
+            var eventType = EventType.Create("payment.succeeded").Data;
             var payload = "{\"amount\": 1000}";
-            var idempotencyKey = IdempotencyKey.Create("evt_abc123");
+            var idempotencyKey = IdempotencyKey.Create("evt_abc123").Data;
             var retryPolicy = RetryPolicy.Default();
 
             //Act
@@ -47,9 +47,9 @@ namespace FlowForge.Domain.Tests.Entities
             //Arrange
             var tenantId = Guid.Empty;
             var endpointId = Guid.NewGuid();
-            var eventType = EventType.Create("payment.succeeded");
+            var eventType = EventType.Create("payment.succeeded").Data;
             var payload = "{\"amount\": 1000}";
-            var idempotencyKey = IdempotencyKey.Create("evt_abc123");
+            var idempotencyKey = IdempotencyKey.Create("evt_abc123").Data;
             var retryPolicy = RetryPolicy.Default();
 
             //Act
@@ -67,9 +67,9 @@ namespace FlowForge.Domain.Tests.Entities
             //Arrange
             var tenantId = Guid.NewGuid();
             var endpointId = Guid.Empty;
-            var eventType = EventType.Create("payment.succeeded");
+            var eventType = EventType.Create("payment.succeeded").Data;
             var payload = "{\"amount\": 1000}";
-            var idempotencyKey = IdempotencyKey.Create("evt_abc123");
+            var idempotencyKey = IdempotencyKey.Create("evt_abc123").Data;
             var retryPolicy = RetryPolicy.Default();
 
             //Act
@@ -87,7 +87,7 @@ namespace FlowForge.Domain.Tests.Entities
             var endpointId = Guid.NewGuid();
             EventType eventType = null!;
             var payload = "{\"amount\": 1000}";
-            var idempotencyKey = IdempotencyKey.Create("evt_abc123");
+            var idempotencyKey = IdempotencyKey.Create("evt_abc123").Data;
             var retryPolicy = RetryPolicy.Default();
 
             //Act
@@ -103,9 +103,9 @@ namespace FlowForge.Domain.Tests.Entities
             //Arrange
             var tenantId = Guid.NewGuid();
             var endpointId = Guid.NewGuid();
-            var eventType = EventType.Create("payment.succeeded");
+            var eventType = EventType.Create("payment.succeeded").Data;
             var payload = "";
-            var idempotencyKey = IdempotencyKey.Create("evt_abc123");
+            var idempotencyKey = IdempotencyKey.Create("evt_abc123").Data;
             var retryPolicy = RetryPolicy.Default();
 
             //Act
@@ -121,7 +121,7 @@ namespace FlowForge.Domain.Tests.Entities
             //Arrange
             var tenantId = Guid.NewGuid();
             var endpointId = Guid.NewGuid();
-            var eventType = EventType.Create("payment.succeeded");
+            var eventType = EventType.Create("payment.succeeded").Data;
             var payload = "{\"amount\": 1000}";
             IdempotencyKey idempotencyKey = null!;
             var retryPolicy = RetryPolicy.Default();
@@ -139,9 +139,9 @@ namespace FlowForge.Domain.Tests.Entities
             //Arrange
             var tenantId = Guid.NewGuid();
             var endpointId = Guid.NewGuid();
-            var eventType = EventType.Create("payment.succeeded");
+            var eventType = EventType.Create("payment.succeeded").Data;
             var payload = "{\"amount\": 1000}";
-            var idempotencyKey = IdempotencyKey.Create("evt_abc123");
+            var idempotencyKey = IdempotencyKey.Create("evt_abc123").Data;
             RetryPolicy retryPolicy = null!;
 
             //Act
@@ -457,9 +457,9 @@ namespace FlowForge.Domain.Tests.Entities
             return WebhookDelivery.Create(
                 tenantId: Guid.NewGuid(),
                 endpointId: Guid.NewGuid(),
-                eventType: EventType.Create("payment.succeeded"),
+                eventType: EventType.Create("payment.succeeded").Data,
                 payload: "{\"amount\": 1000}",
-                idempotencyKey: IdempotencyKey.Create("evt_abc123"),
+                idempotencyKey: IdempotencyKey.Create("evt_abc123").Data,
                 retryPolicy: RetryPolicy.Default()
             );
         }

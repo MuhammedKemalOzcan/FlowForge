@@ -30,7 +30,8 @@ namespace FlowForge.Domain.Entities
                 Email = email,
                 FullName = fullName,
                 Status = Status.Active,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             };
 
             return user;
@@ -71,4 +72,5 @@ namespace FlowForge.Domain.Entities
             Status = Status.Deleted;
             UpdatedAt = DateTime.UtcNow;
         }
+    }
 }
