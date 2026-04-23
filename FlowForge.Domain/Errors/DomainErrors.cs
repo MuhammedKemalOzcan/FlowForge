@@ -42,6 +42,7 @@
         public static class WebhookEndpoint
         {
             public static Error AlreadyDeactivated => Error.Conflict("WebhookEndpoint.AlreadyDeactivated", "The webhook endpoint is already deactivated.");
+            public static Error NotFound => Error.NotFound("WebhookEndpoint.NotFound", "Endpoint cannot be found.");
         }
 
         public static class ExternalIdentityId
