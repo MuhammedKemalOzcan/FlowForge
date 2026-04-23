@@ -6,12 +6,19 @@
         public T Data { get; private set; }
         public Error Error { get; private set; }
 
+        private readonly T _data;
+
         private Result(bool isSuccess, T? data, Error? error)
         {
             IsSuccess = isSuccess;
             Data = data;
             Error = error;
         }
+
+        public T Value => IsSuccess
+        ? _data
+        : throw new InvalidOperationException("Cannot access Value on a failed result.")
+
 
         public static Result<T> Success(T data) => new(true, data, Error.None);
 
