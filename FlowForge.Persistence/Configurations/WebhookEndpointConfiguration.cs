@@ -47,6 +47,11 @@ namespace FlowForge.Persistence.Configurations
                 eventTypeBuilder.Property(x => x.Value)
                 .IsRequired();
             });
+            //Readonly collection olduğundan _eventTypes (backing field) kullanmasını söyledik.
+            builder.Navigation(x => x.SubscribedEventTypes)
+                .HasField("_eventTypes")
+                .UsePropertyAccessMode(PropertyAccessMode.Field);
+
             builder.OwnsOne(x => x.RetryPolicy, policyBuilder =>
             {
                 policyBuilder.Property(x => x.MaxAttempts)

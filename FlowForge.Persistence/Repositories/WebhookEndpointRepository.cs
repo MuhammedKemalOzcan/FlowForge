@@ -23,12 +23,14 @@ namespace FlowForge.Persistence.Repositories
         {
             return await _context.WebhookEndpoints
                 .Where(x => x.TenantId == tenantId)
+                .Include(x => x.SubscribedEventTypes)
                 .ToListAsync();
         }
 
         public async Task<WebhookEndpoint?> GetByIdAsync(Guid id, Guid tenantId)
         {
             return await _context.WebhookEndpoints
+                .Include(x => x.SubscribedEventTypes)
                 .FirstOrDefaultAsync(x => x.TenantId == tenantId && x.Id == id);
         }
 

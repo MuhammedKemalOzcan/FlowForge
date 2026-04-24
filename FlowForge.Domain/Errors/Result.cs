@@ -17,8 +17,7 @@
 
         public T Value => IsSuccess
         ? _data
-        : throw new InvalidOperationException("Cannot access Value on a failed result.")
-
+        : throw new InvalidOperationException("Cannot access Value on a failed result.");
 
         public static Result<T> Success(T data) => new(true, data, Error.None);
 

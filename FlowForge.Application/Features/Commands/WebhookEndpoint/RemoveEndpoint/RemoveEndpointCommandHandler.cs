@@ -17,7 +17,7 @@ namespace FlowForge.Application.Features.Commands.WebhookEndpoint.RemoveEndpoint
 
         public async Task<Result> Handle(RemoveEndpointCommand request, CancellationToken cancellationToken)
         {
-            var endpoint = await _endpointRepository.GetByIdAsync(request.Id, request.tenantId);
+            var endpoint = await _endpointRepository.GetByIdAsync(request.Id, request.TenantId);
 
             if (endpoint is null) return Result.Failure(DomainErrors.WebhookEndpoint.NotFound);
 

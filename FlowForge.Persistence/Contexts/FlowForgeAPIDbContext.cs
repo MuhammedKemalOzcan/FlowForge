@@ -1,10 +1,11 @@
-﻿using FlowForge.Domain.Entities;
+﻿using FlowForge.Application.Data;
+using FlowForge.Domain.Entities;
 using FlowForge.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace FlowForge.Persistence.Contexts
 {
-    public class FlowForgeAPIDbContext : DbContext, IUnitOfWork
+    public class FlowForgeAPIDbContext : DbContext, IUnitOfWork, IFlowForgeApiDbContext
     {
         public FlowForgeAPIDbContext(DbContextOptions options) : base(options)
         {
