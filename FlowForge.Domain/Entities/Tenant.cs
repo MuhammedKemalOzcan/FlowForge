@@ -19,9 +19,9 @@ namespace FlowForge.Domain.Entities
         {
         }
 
-        public static Tenant Create(string name, Guid userId)
+        public static Result<Tenant> Create(string name, Guid userId)
         {
-            if (string.IsNullOrEmpty(name)) throw new ArgumentException("Name cannot be null");
+            if (string.IsNullOrEmpty(name)) return Result<Tenant>.Failure(DomainErrors.Tenant.EmptyName);
             if (userId == Guid.Empty) throw new ArgumentException("user cannot be found");
 
             var tenant = new Tenant()
@@ -37,7 +37,7 @@ namespace FlowForge.Domain.Entities
             var membership = new Membership(userId, Roles.Owner);
             tenant._memberships.Add(membership);
 
-            return tenant;
+            return Result<Tenant>.Success(tenant);
         }
 
         //Handler da downgrade durumlarında gerekli kontrolleri sağla (endpointler silinmeli üye sayısı düşürülmeli)

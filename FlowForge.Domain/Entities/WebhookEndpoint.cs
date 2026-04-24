@@ -68,8 +68,8 @@ namespace FlowForge.Domain.Entities
             var toAdd = eventTypes.Except(_eventTypes).ToList();
             var toRemove = _eventTypes.Except(eventTypes).ToList();
 
-            foreach (var eventType in toRemove) Unsubscribe(eventType);
             foreach (var eventType in toAdd) Subscribe(eventType);
+            foreach (var eventType in toRemove) Unsubscribe(eventType);
             UpdatedAt = DateTime.UtcNow;
         }
 

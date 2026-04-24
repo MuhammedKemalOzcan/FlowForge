@@ -1,3 +1,5 @@
+using FlowForge.Application;
+using FlowForge.Persistence;
 
 namespace FlowForge.API
 {
@@ -14,6 +16,9 @@ namespace FlowForge.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddPersistenceServices(builder.Configuration);
+            builder.Services.AddApplicationServices();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -26,7 +31,6 @@ namespace FlowForge.API
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 

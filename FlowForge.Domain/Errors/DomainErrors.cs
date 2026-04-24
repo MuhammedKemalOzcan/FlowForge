@@ -43,6 +43,8 @@
         {
             public static Error AlreadyDeactivated => Error.Conflict("WebhookEndpoint.AlreadyDeactivated", "The webhook endpoint is already deactivated.");
             public static Error NotFound => Error.NotFound("WebhookEndpoint.NotFound", "Endpoint cannot be found.");
+            public static Error EndpointNotActive => Error.NotFound("WebhookEndpoint.EndpointNotActive", "Endpoint is not active.");
+            public static Error NotSubscribedToEventType => Error.NotFound("WebhookEndpoint.NotSubscribedToEventType", "This Endpoint is not subscribed to event types");
         }
 
         public static class ExternalIdentityId
@@ -64,8 +66,10 @@
         public static class Tenant
         {
             public static Error ReachedMaxMember => Error.LimitExceeded("Tenant.ReachedMaxMember", "Max number of members has been reached.");
+            public static Error EmptyName => Error.Validation("Tenant.EmptyName", "Name cannot be empty.");
             public static Error MemberAlreadyExist => Error.Conflict("Tenant.MemberAlreadyExist", "This user is already a member.");
             public static Error MemberCannotFound => Error.NotFound("Tenant.MemberCannotFound", "This user is not a member.");
+            public static Error TenantCannotFound => Error.NotFound("Tenant.TenantCannotFound", "Tenant cannot be found!");
             public static Error OwnerCannotBeRemoved => Error.Forbidden("Tenant.OwnerCannotBeRemoved", "Owner cannot be removed.");
         }
     }
