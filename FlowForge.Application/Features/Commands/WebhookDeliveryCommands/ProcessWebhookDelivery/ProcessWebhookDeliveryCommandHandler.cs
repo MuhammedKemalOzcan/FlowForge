@@ -1,9 +1,9 @@
-﻿using FlowForge.Application.Data;
-using FlowForge.Domain.Entities;
+﻿using FlowForge.Application.Messages;
 using FlowForge.Domain.Enums;
 using FlowForge.Domain.Errors;
 using FlowForge.Domain.Repositories;
 using FlowForge.Domain.Services;
+using MassTransit;
 using MediatR;
 
 namespace FlowForge.Application.Features.Commands.WebhookDeliveryCommands.ProcessWebhookDelivery
@@ -52,7 +52,6 @@ namespace FlowForge.Application.Features.Commands.WebhookDeliveryCommands.Proces
                 delivery.RecordFailedAttempt(result.DurationMs, result.StatusCode, result.ErrorMessage, result.StartedAt, result.CompletedAt);
             }
 
-           
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return Result.Success();

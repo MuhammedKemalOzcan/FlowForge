@@ -1,9 +1,7 @@
+using FlowForge.API.BackgroundServices;
 using FlowForge.Application;
 using FlowForge.Infrastructure;
 using FlowForge.Persistence;
-using FlowForge.Persistence.Contexts;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace FlowForge.API
 {
@@ -22,7 +20,9 @@ namespace FlowForge.API
 
             builder.Services.AddPersistenceServices(builder.Configuration);
             builder.Services.AddApplicationServices();
-            builder.Services.AddInfrastructureServices();
+            builder.Services.AddInfrastructureServices(builder.Configuration);
+
+            builder.Services.AddHostedService<DeliveryProcessorWorker>();
 
             var app = builder.Build();
 
