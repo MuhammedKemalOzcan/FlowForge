@@ -58,53 +58,7 @@ namespace FlowForge.Persistence.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("ApiKeys");
-                });
-
-            modelBuilder.Entity("FlowForge.Domain.Entities.DeliveryAttempt", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("AttemptNumber")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("CompletedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<long>("DurationMs")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("ErrorMessage")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Outcome")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("ResponseBodySnippet")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("StartedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("StatusCode")
-                        .HasColumnType("text");
-
-                    b.Property<Guid?>("WebhookDeliveryId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("WebhookDeliveryId1")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("WebhookDeliveryId");
-
-                    b.HasIndex("WebhookDeliveryId1");
-
-                    b.ToTable("DeliveryAttempt");
+                    b.ToTable("ApiKeys", (string)null);
                 });
 
             modelBuilder.Entity("FlowForge.Domain.Entities.Membership", b =>
@@ -124,7 +78,7 @@ namespace FlowForge.Persistence.Migrations
 
                     b.HasKey("TenantId", "UserId");
 
-                    b.ToTable("Membership");
+                    b.ToTable("Membership", (string)null);
                 });
 
             modelBuilder.Entity("FlowForge.Domain.Entities.Tenant", b =>
@@ -151,7 +105,7 @@ namespace FlowForge.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tenants");
+                    b.ToTable("Tenants", (string)null);
                 });
 
             modelBuilder.Entity("FlowForge.Domain.Entities.User", b =>
@@ -177,7 +131,7 @@ namespace FlowForge.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("FlowForge.Domain.Entities.WebhookDelivery", b =>
@@ -216,7 +170,7 @@ namespace FlowForge.Persistence.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("WebhookDeliveries");
+                    b.ToTable("WebhookDeliveries", (string)null);
                 });
 
             modelBuilder.Entity("FlowForge.Domain.Entities.WebhookEndpoint", b =>
@@ -241,7 +195,7 @@ namespace FlowForge.Persistence.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("WebhookEndpoints");
+                    b.ToTable("WebhookEndpoints", (string)null);
                 });
 
             modelBuilder.Entity("FlowForge.Domain.Entities.ApiKey", b =>
@@ -252,7 +206,7 @@ namespace FlowForge.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("FlowForge.Domain.ValueObjects.HashedApiKey", "Key", b1 =>
+                    b.OwnsOne("FlowForge.Domain.Entities.ApiKey.Key#FlowForge.Domain.ValueObjects.HashedApiKey", "Key", b1 =>
                         {
                             b1.Property<Guid>("ApiKeyId")
                                 .HasColumnType("uuid");
@@ -267,7 +221,7 @@ namespace FlowForge.Persistence.Migrations
                             b1.HasIndex("Value")
                                 .IsUnique();
 
-                            b1.ToTable("ApiKeys");
+                            b1.ToTable("ApiKeys", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("ApiKeyId");
@@ -275,17 +229,6 @@ namespace FlowForge.Persistence.Migrations
 
                     b.Navigation("Key")
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("FlowForge.Domain.Entities.DeliveryAttempt", b =>
-                {
-                    b.HasOne("FlowForge.Domain.Entities.WebhookDelivery", null)
-                        .WithMany()
-                        .HasForeignKey("WebhookDeliveryId");
-
-                    b.HasOne("FlowForge.Domain.Entities.WebhookDelivery", null)
-                        .WithMany("Attempts")
-                        .HasForeignKey("WebhookDeliveryId1");
                 });
 
             modelBuilder.Entity("FlowForge.Domain.Entities.Membership", b =>
@@ -299,7 +242,7 @@ namespace FlowForge.Persistence.Migrations
 
             modelBuilder.Entity("FlowForge.Domain.Entities.Tenant", b =>
                 {
-                    b.OwnsOne("FlowForge.Domain.ValueObjects.PlanLimits", "PlanLimits", b1 =>
+                    b.OwnsOne("FlowForge.Domain.Entities.Tenant.PlanLimits#FlowForge.Domain.ValueObjects.PlanLimits", "PlanLimits", b1 =>
                         {
                             b1.Property<Guid>("TenantId")
                                 .HasColumnType("uuid");
@@ -315,7 +258,7 @@ namespace FlowForge.Persistence.Migrations
 
                             b1.HasKey("TenantId");
 
-                            b1.ToTable("Tenants");
+                            b1.ToTable("Tenants", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("TenantId");
@@ -327,7 +270,7 @@ namespace FlowForge.Persistence.Migrations
 
             modelBuilder.Entity("FlowForge.Domain.Entities.User", b =>
                 {
-                    b.OwnsOne("FlowForge.Domain.ValueObjects.Email", "Email", b1 =>
+                    b.OwnsOne("FlowForge.Domain.Entities.User.Email#FlowForge.Domain.ValueObjects.Email", "Email", b1 =>
                         {
                             b1.Property<Guid>("UserId")
                                 .HasColumnType("uuid");
@@ -339,13 +282,13 @@ namespace FlowForge.Persistence.Migrations
 
                             b1.HasKey("UserId");
 
-                            b1.ToTable("Users");
+                            b1.ToTable("Users", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("UserId");
                         });
 
-                    b.OwnsOne("FlowForge.Domain.ValueObjects.ExternalIdentityId", "ExternalIdentityId", b1 =>
+                    b.OwnsOne("FlowForge.Domain.Entities.User.ExternalIdentityId#FlowForge.Domain.ValueObjects.ExternalIdentityId", "ExternalIdentityId", b1 =>
                         {
                             b1.Property<Guid>("UserId")
                                 .HasColumnType("uuid");
@@ -359,7 +302,7 @@ namespace FlowForge.Persistence.Migrations
                             b1.HasIndex("ExternalId")
                                 .IsUnique();
 
-                            b1.ToTable("Users");
+                            b1.ToTable("Users", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("UserId");
@@ -386,7 +329,51 @@ namespace FlowForge.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("FlowForge.Domain.ValueObjects.EventType", "EventType", b1 =>
+                    b.OwnsMany("FlowForge.Domain.Entities.WebhookDelivery.Attempts#FlowForge.Domain.Entities.DeliveryAttempt", "Attempts", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("uuid");
+
+                            b1.Property<int>("AttemptNumber")
+                                .HasColumnType("integer");
+
+                            b1.Property<DateTime>("CompletedAt")
+                                .HasColumnType("timestamp with time zone");
+
+                            b1.Property<long>("DurationMs")
+                                .HasColumnType("bigint");
+
+                            b1.Property<string>("ErrorMessage")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("Outcome")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("ResponseBodySnippet")
+                                .HasColumnType("text");
+
+                            b1.Property<DateTime>("StartedAt")
+                                .HasColumnType("timestamp with time zone");
+
+                            b1.Property<string>("StatusCode")
+                                .HasColumnType("text");
+
+                            b1.Property<Guid>("WebhookDeliveryId")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("WebhookDeliveryId");
+
+                            b1.ToTable("DeliveryAttempt", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("WebhookDeliveryId");
+                        });
+
+                    b.OwnsOne("FlowForge.Domain.Entities.WebhookDelivery.EventType#FlowForge.Domain.ValueObjects.EventType", "EventType", b1 =>
                         {
                             b1.Property<Guid>("WebhookDeliveryId")
                                 .HasColumnType("uuid");
@@ -398,13 +385,34 @@ namespace FlowForge.Persistence.Migrations
 
                             b1.HasKey("WebhookDeliveryId");
 
-                            b1.ToTable("WebhookDeliveries");
+                            b1.ToTable("WebhookDeliveries", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("WebhookDeliveryId");
                         });
 
-                    b.OwnsOne("FlowForge.Domain.ValueObjects.RetryPolicy", "RetryPolicy", b1 =>
+                    b.OwnsOne("FlowForge.Domain.Entities.WebhookDelivery.IdempotencyKey#FlowForge.Domain.ValueObjects.IdempotencyKey", "IdempotencyKey", b1 =>
+                        {
+                            b1.Property<Guid>("WebhookDeliveryId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(255)
+                                .HasColumnType("character varying(255)");
+
+                            b1.HasKey("WebhookDeliveryId");
+
+                            b1.HasIndex("Value")
+                                .IsUnique();
+
+                            b1.ToTable("WebhookDeliveries", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("WebhookDeliveryId");
+                        });
+
+                    b.OwnsOne("FlowForge.Domain.Entities.WebhookDelivery.RetryPolicy#FlowForge.Domain.ValueObjects.RetryPolicy", "RetryPolicy", b1 =>
                         {
                             b1.Property<Guid>("WebhookDeliveryId")
                                 .HasColumnType("uuid");
@@ -427,32 +435,13 @@ namespace FlowForge.Persistence.Migrations
 
                             b1.HasKey("WebhookDeliveryId");
 
-                            b1.ToTable("WebhookDeliveries");
+                            b1.ToTable("WebhookDeliveries", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("WebhookDeliveryId");
                         });
 
-                    b.OwnsOne("FlowForge.Domain.ValueObjects.IdempotencyKey", "IdempotencyKey", b1 =>
-                        {
-                            b1.Property<Guid>("WebhookDeliveryId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(255)
-                                .HasColumnType("character varying(255)");
-
-                            b1.HasKey("WebhookDeliveryId");
-
-                            b1.HasIndex("Value")
-                                .IsUnique();
-
-                            b1.ToTable("WebhookDeliveries");
-
-                            b1.WithOwner()
-                                .HasForeignKey("WebhookDeliveryId");
-                        });
+                    b.Navigation("Attempts");
 
                     b.Navigation("EventType")
                         .IsRequired();
@@ -472,7 +461,25 @@ namespace FlowForge.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("FlowForge.Domain.ValueObjects.RetryPolicy", "RetryPolicy", b1 =>
+                    b.OwnsOne("FlowForge.Domain.Entities.WebhookEndpoint.Name#FlowForge.Domain.ValueObjects.EndpointName", "Name", b1 =>
+                        {
+                            b1.Property<Guid>("WebhookEndpointId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)");
+
+                            b1.HasKey("WebhookEndpointId");
+
+                            b1.ToTable("WebhookEndpoints", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("WebhookEndpointId");
+                        });
+
+                    b.OwnsOne("FlowForge.Domain.Entities.WebhookEndpoint.RetryPolicy#FlowForge.Domain.ValueObjects.RetryPolicy", "RetryPolicy", b1 =>
                         {
                             b1.Property<Guid>("WebhookEndpointId")
                                 .HasColumnType("uuid");
@@ -495,13 +502,31 @@ namespace FlowForge.Persistence.Migrations
 
                             b1.HasKey("WebhookEndpointId");
 
-                            b1.ToTable("WebhookEndpoints");
+                            b1.ToTable("WebhookEndpoints", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("WebhookEndpointId");
                         });
 
-                    b.OwnsMany("FlowForge.Domain.ValueObjects.EventType", "SubscribedEventTypes", b1 =>
+                    b.OwnsOne("FlowForge.Domain.Entities.WebhookEndpoint.SigningSecret#FlowForge.Domain.ValueObjects.SigningSecret", "SigningSecret", b1 =>
+                        {
+                            b1.Property<Guid>("WebhookEndpointId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(255)
+                                .HasColumnType("character varying(255)");
+
+                            b1.HasKey("WebhookEndpointId");
+
+                            b1.ToTable("WebhookEndpoints", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("WebhookEndpointId");
+                        });
+
+                    b.OwnsMany("FlowForge.Domain.Entities.WebhookEndpoint.SubscribedEventTypes#FlowForge.Domain.ValueObjects.EventType", "SubscribedEventTypes", b1 =>
                         {
                             b1.Property<Guid>("WebhookEndpointId")
                                 .HasColumnType("uuid");
@@ -518,31 +543,13 @@ namespace FlowForge.Persistence.Migrations
 
                             b1.HasKey("WebhookEndpointId", "Id");
 
-                            b1.ToTable("WebhookEndpoints_SubscribedEventTypes");
+                            b1.ToTable("WebhookEndpoints_SubscribedEventTypes", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("WebhookEndpointId");
                         });
 
-                    b.OwnsOne("FlowForge.Domain.ValueObjects.EndpointName", "Name", b1 =>
-                        {
-                            b1.Property<Guid>("WebhookEndpointId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(100)
-                                .HasColumnType("character varying(100)");
-
-                            b1.HasKey("WebhookEndpointId");
-
-                            b1.ToTable("WebhookEndpoints");
-
-                            b1.WithOwner()
-                                .HasForeignKey("WebhookEndpointId");
-                        });
-
-                    b.OwnsOne("FlowForge.Domain.ValueObjects.SigningSecret", "SigningSecret", b1 =>
+                    b.OwnsOne("FlowForge.Domain.Entities.WebhookEndpoint.TargetUrl#FlowForge.Domain.ValueObjects.Url", "TargetUrl", b1 =>
                         {
                             b1.Property<Guid>("WebhookEndpointId")
                                 .HasColumnType("uuid");
@@ -554,25 +561,7 @@ namespace FlowForge.Persistence.Migrations
 
                             b1.HasKey("WebhookEndpointId");
 
-                            b1.ToTable("WebhookEndpoints");
-
-                            b1.WithOwner()
-                                .HasForeignKey("WebhookEndpointId");
-                        });
-
-                    b.OwnsOne("FlowForge.Domain.ValueObjects.Url", "TargetUrl", b1 =>
-                        {
-                            b1.Property<Guid>("WebhookEndpointId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(255)
-                                .HasColumnType("character varying(255)");
-
-                            b1.HasKey("WebhookEndpointId");
-
-                            b1.ToTable("WebhookEndpoints");
+                            b1.ToTable("WebhookEndpoints", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("WebhookEndpointId");
@@ -596,11 +585,6 @@ namespace FlowForge.Persistence.Migrations
             modelBuilder.Entity("FlowForge.Domain.Entities.Tenant", b =>
                 {
                     b.Navigation("Memberships");
-                });
-
-            modelBuilder.Entity("FlowForge.Domain.Entities.WebhookDelivery", b =>
-                {
-                    b.Navigation("Attempts");
                 });
 #pragma warning restore 612, 618
         }

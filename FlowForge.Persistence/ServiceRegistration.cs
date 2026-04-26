@@ -5,6 +5,7 @@ using FlowForge.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace FlowForge.Persistence
 {
@@ -17,11 +18,12 @@ namespace FlowForge.Persistence
                 options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
             });
 
+            
+
             services.AddScoped<ITenantRepository, TenantRepository>();
             services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<FlowForgeAPIDbContext>());
             services.AddScoped<IFlowForgeApiDbContext>(provider => provider.GetRequiredService<FlowForgeAPIDbContext>());
             services.AddScoped<IWebhookEndpointRepository, WebhookEndpointRepository>();
-            services.AddScoped<IWebhookDeliveryRepository, WebhookDeliveryRepository>();
             services.AddScoped<IWebhookDeliveryRepository, WebhookDeliveryRepository>();
         }
     }

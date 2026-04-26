@@ -1,5 +1,9 @@
 using FlowForge.Application;
+using FlowForge.Infrastructure;
 using FlowForge.Persistence;
+using FlowForge.Persistence.Contexts;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace FlowForge.API
 {
@@ -18,6 +22,7 @@ namespace FlowForge.API
 
             builder.Services.AddPersistenceServices(builder.Configuration);
             builder.Services.AddApplicationServices();
+            builder.Services.AddInfrastructureServices();
 
             var app = builder.Build();
 

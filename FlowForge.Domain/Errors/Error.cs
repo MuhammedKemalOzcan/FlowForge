@@ -22,5 +22,6 @@ namespace FlowForge.Domain.Errors
         public static Error Conflict(string code, string message) => new(code, message, ErrorType.Conflict);
         public static Error LimitExceeded(string code, string message) => new(code, message, ErrorType.LimitExceeded);
         public static Error Forbidden(string code, string message) => new(code, message, ErrorType.Forbidden);
+        public static Error BadRequest(string code, string message) => new(code, message, ErrorType.BadRequest);
     }
 }

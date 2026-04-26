@@ -29,10 +29,19 @@ namespace FlowForge.Persistence.Configurations
                 .WithMany()
                 .HasForeignKey(x => x.EndpointId);
 
-            builder.HasMany<DeliveryAttempt>()
-                .WithOne()
-                .HasForeignKey("WebhookDeliveryId");
-
+            builder.OwnsMany(x => x.Attempts, attemptBuilder =>
+            {
+                attemptBuilder.ToTable("DeliveryAttempt");
+                attemptBuilder.HasKey(x => x.Id);
+                attemptBuilder.WithOwner().HasForeignKey("WebhookDeliveryId");
+                attemptBuilder.Property(x => x.Id).ValueGeneratedNever();
+                attemptBuilder.Property(x => x.AttemptNumber).IsRequired();
+                attemptBuilder.Property(x => x.StartedAt).IsRequired();
+                attemptBuilder.Property(x => x.CompletedAt).IsRequired();
+                attemptBuilder.Property(x => x.DurationMs).IsRequired();
+                attemptBuilder.Property(x => x.StatusCode).HasConversion<string>();
+                attemptBuilder.Property(x => x.Outcome).HasConversion<string>().IsRequired();
+            });
             builder.OwnsOne(x => x.EventType, eventTypeBuilder =>
             {
                 eventTypeBuilder.Property(x => x.Value)

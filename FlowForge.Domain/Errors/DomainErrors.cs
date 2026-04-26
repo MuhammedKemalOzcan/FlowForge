@@ -72,5 +72,11 @@
             public static Error TenantCannotFound => Error.NotFound("Tenant.TenantCannotFound", "Tenant cannot be found!");
             public static Error OwnerCannotBeRemoved => Error.Forbidden("Tenant.OwnerCannotBeRemoved", "Owner cannot be removed.");
         }
+
+        public static class WebhookDelivery
+        {
+            public static Error DeliveryNotFound => Error.NotFound("Delivery.DeliveryNotFound", "Delivery cannot be found!");
+            public static Error NotInPendingState => Error.BadRequest("Delivery.NotInPendingState", "Webhooks that are not pending cannot be processed.");
+        }
     }
 }

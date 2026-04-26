@@ -18,7 +18,7 @@ namespace FlowForge.Domain.Entities
         public DateTime? NextRetryAt { get; private set; }
         public DateTime? FinalResultAt { get; private set; }
 
-        private readonly List<DeliveryAttempt> _attempts = new();
+        private List<DeliveryAttempt> _attempts = new();
         public IReadOnlyCollection<DeliveryAttempt> Attempts => _attempts.AsReadOnly();
 
         private WebhookDelivery()

@@ -1,4 +1,5 @@
 ﻿using FlowForge.Domain.Entities;
+using FlowForge.Domain.Enums;
 using FlowForge.Domain.Repositories;
 using FlowForge.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
@@ -19,14 +20,6 @@ namespace FlowForge.Persistence.Repositories
             _context.Add(delivery);
         }
 
-        public async Task<List<WebhookDelivery>> GetAllAsync(Guid tenantId)
-        {
-            return await _context.WebhookDeliveries
-                .Where(x => x.TenantId == tenantId)
-                .Include(x => x.Attempts)
-                .ToListAsync();
-        }
-
         public async Task<WebhookDelivery?> GetByIdAsync(Guid id, Guid tenantId)
         {
             return await _context.WebhookDeliveries
@@ -39,6 +32,15 @@ namespace FlowForge.Persistence.Repositories
             return await _context.WebhookDeliveries
                 .Include(x => x.Attempts)
                 .FirstOrDefaultAsync(x => x.IdempotencyKey.Value == idempotencyKey && x.TenantId == tenantId);
+        }
+
+        public async Task<List<WebhookDelivery>> GetPendingDeliveriesAsync()
+        {
+            return await _context.WebhookDeliveries
+                .AsNoTracking()
+                .Where(x => x.Status == DeliveryStatus.Pending && (x.NextRetryAt == null || x.NextRetryAt <= DateTime.UtcNow))
+                .Take(50)
+                .ToListAsync();
         }
 
         public void Remove(WebhookDelivery delivery)

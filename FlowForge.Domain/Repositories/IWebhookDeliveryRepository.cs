@@ -1,10 +1,11 @@
 ﻿using FlowForge.Domain.Entities;
+using FlowForge.Domain.Enums;
 
 namespace FlowForge.Domain.Repositories
 {
     public interface IWebhookDeliveryRepository
     {
-        Task<List<WebhookDelivery>> GetAllAsync(Guid tenantId);
+        Task<List<WebhookDelivery>> GetPendingDeliveriesAsync();
 
         Task<WebhookDelivery?> GetByIdAsync(Guid Id, Guid tenantId);
 

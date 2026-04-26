@@ -19,7 +19,7 @@ namespace FlowForge.Persistence
                 .AddEnvironmentVariables()
                 .Build();
 
-            var connectionString = configuration.GetConnectionString("Postgres");
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
 
             var optionsBuilder = new DbContextOptionsBuilder<FlowForgeAPIDbContext>();
 

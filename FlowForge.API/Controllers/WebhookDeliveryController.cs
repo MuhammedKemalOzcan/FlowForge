@@ -1,4 +1,5 @@
 ﻿using FlowForge.Application.Features.Commands.WebhookDeliveryCommands.CreateDelivery;
+using FlowForge.Application.Features.Commands.WebhookDeliveryCommands.ProcessWebhookDelivery;
 using FlowForge.Application.Features.Queries.WebhookDeliveriesQuery;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +28,18 @@ namespace FlowForge.API.Controllers
         public async Task<IActionResult> ListWebhooks([FromQuery] WebhookDeliveryQuery query)
         {
             var result = await _mediator.Send(query);
+            return HandleResult(result);
+        }
+
+        public record ProcessDeliveryRequest(Guid TenantId);
+
+        [HttpPost("{deliveryId}/process")]
+        public async Task<IActionResult> ProcessDelivery(
+    [FromRoute] Guid deliveryId,
+    [FromBody] ProcessDeliveryRequest request)
+        {
+            var command = new ProcessWebhookDeliveryCommand(deliveryId, request.TenantId);
+            var result = await _mediator.Send(command);
             return HandleResult(result);
         }
     }

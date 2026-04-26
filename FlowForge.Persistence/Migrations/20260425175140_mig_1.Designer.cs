@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FlowForge.Persistence.Migrations
 {
     [DbContext(typeof(FlowForgeAPIDbContext))]
-    [Migration("20260419192454_mig_1")]
+    [Migration("20260425175140_mig_1")]
     partial class mig_1
     {
         /// <inheritdoc />
@@ -62,52 +62,6 @@ namespace FlowForge.Persistence.Migrations
                     b.HasIndex("TenantId");
 
                     b.ToTable("ApiKeys");
-                });
-
-            modelBuilder.Entity("FlowForge.Domain.Entities.DeliveryAttempt", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("AttemptNumber")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("CompletedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<long>("DurationMs")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("ErrorMessage")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Outcome")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("ResponseBodySnippet")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("StartedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("StatusCode")
-                        .HasColumnType("text");
-
-                    b.Property<Guid?>("WebhookDeliveryId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("WebhookDeliveryId1")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("WebhookDeliveryId");
-
-                    b.HasIndex("WebhookDeliveryId1");
-
-                    b.ToTable("DeliveryAttempt");
                 });
 
             modelBuilder.Entity("FlowForge.Domain.Entities.Membership", b =>
@@ -280,17 +234,6 @@ namespace FlowForge.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("FlowForge.Domain.Entities.DeliveryAttempt", b =>
-                {
-                    b.HasOne("FlowForge.Domain.Entities.WebhookDelivery", null)
-                        .WithMany()
-                        .HasForeignKey("WebhookDeliveryId");
-
-                    b.HasOne("FlowForge.Domain.Entities.WebhookDelivery", null)
-                        .WithMany("Attempts")
-                        .HasForeignKey("WebhookDeliveryId1");
-                });
-
             modelBuilder.Entity("FlowForge.Domain.Entities.Membership", b =>
                 {
                     b.HasOne("FlowForge.Domain.Entities.Tenant", null)
@@ -389,6 +332,50 @@ namespace FlowForge.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.OwnsMany("FlowForge.Domain.Entities.DeliveryAttempt", "Attempts", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("uuid");
+
+                            b1.Property<int>("AttemptNumber")
+                                .HasColumnType("integer");
+
+                            b1.Property<DateTime>("CompletedAt")
+                                .HasColumnType("timestamp with time zone");
+
+                            b1.Property<long>("DurationMs")
+                                .HasColumnType("bigint");
+
+                            b1.Property<string>("ErrorMessage")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("Outcome")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("ResponseBodySnippet")
+                                .HasColumnType("text");
+
+                            b1.Property<DateTime>("StartedAt")
+                                .HasColumnType("timestamp with time zone");
+
+                            b1.Property<string>("StatusCode")
+                                .HasColumnType("text");
+
+                            b1.Property<Guid>("WebhookDeliveryId")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("WebhookDeliveryId");
+
+                            b1.ToTable("DeliveryAttempt", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("WebhookDeliveryId");
+                        });
+
                     b.OwnsOne("FlowForge.Domain.ValueObjects.EventType", "EventType", b1 =>
                         {
                             b1.Property<Guid>("WebhookDeliveryId")
@@ -456,6 +443,8 @@ namespace FlowForge.Persistence.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("WebhookDeliveryId");
                         });
+
+                    b.Navigation("Attempts");
 
                     b.Navigation("EventType")
                         .IsRequired();
@@ -599,11 +588,6 @@ namespace FlowForge.Persistence.Migrations
             modelBuilder.Entity("FlowForge.Domain.Entities.Tenant", b =>
                 {
                     b.Navigation("Memberships");
-                });
-
-            modelBuilder.Entity("FlowForge.Domain.Entities.WebhookDelivery", b =>
-                {
-                    b.Navigation("Attempts");
                 });
 #pragma warning restore 612, 618
         }

@@ -191,8 +191,7 @@ namespace FlowForge.Persistence.Migrations
                     ResponseBodySnippet = table.Column<string>(type: "text", nullable: true),
                     ErrorMessage = table.Column<string>(type: "text", nullable: true),
                     Outcome = table.Column<string>(type: "text", nullable: false),
-                    WebhookDeliveryId = table.Column<Guid>(type: "uuid", nullable: true),
-                    WebhookDeliveryId1 = table.Column<Guid>(type: "uuid", nullable: true)
+                    WebhookDeliveryId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -201,12 +200,8 @@ namespace FlowForge.Persistence.Migrations
                         name: "FK_DeliveryAttempt_WebhookDeliveries_WebhookDeliveryId",
                         column: x => x.WebhookDeliveryId,
                         principalTable: "WebhookDeliveries",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_DeliveryAttempt_WebhookDeliveries_WebhookDeliveryId1",
-                        column: x => x.WebhookDeliveryId1,
-                        principalTable: "WebhookDeliveries",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -224,11 +219,6 @@ namespace FlowForge.Persistence.Migrations
                 name: "IX_DeliveryAttempt_WebhookDeliveryId",
                 table: "DeliveryAttempt",
                 column: "WebhookDeliveryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_DeliveryAttempt_WebhookDeliveryId1",
-                table: "DeliveryAttempt",
-                column: "WebhookDeliveryId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_ExternalIdentityId_ExternalId",
