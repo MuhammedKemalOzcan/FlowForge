@@ -1,7 +1,9 @@
-﻿using FlowForge.Domain.Entities;
+﻿using FlowForge.Application.Messages;
+using FlowForge.Domain.Entities;
 using FlowForge.Domain.Errors;
 using FlowForge.Domain.Repositories;
 using FlowForge.Domain.ValueObjects;
+using MassTransit;
 using MediatR;
 
 namespace FlowForge.Application.Features.Commands.WebhookDeliveryCommands.CreateDelivery
@@ -11,12 +13,14 @@ namespace FlowForge.Application.Features.Commands.WebhookDeliveryCommands.Create
         private readonly IWebhookDeliveryRepository _webhookDelivery;
         private readonly IWebhookEndpointRepository _endpointRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public CreateDeliveryCommandHandler(IWebhookDeliveryRepository webhookDelivery, IUnitOfWork unitOfWork, IWebhookEndpointRepository endpointRepository)
+        public CreateDeliveryCommandHandler(IWebhookDeliveryRepository webhookDelivery, IUnitOfWork unitOfWork, IWebhookEndpointRepository endpointRepository, IPublishEndpoint publishEndpoint)
         {
             _webhookDelivery = webhookDelivery;
             _unitOfWork = unitOfWork;
             _endpointRepository = endpointRepository;
+            _publishEndpoint = publishEndpoint;
         }
 
         public async Task<Result<Guid>> Handle(CreateDeliveryCommand request, CancellationToken cancellationToken)
@@ -47,6 +51,9 @@ namespace FlowForge.Application.Features.Commands.WebhookDeliveryCommands.Create
 
             _webhookDelivery.Add(delivery);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            await _publishEndpoint.Publish(new ProcessWebhookDeliveryMessage(delivery.Id, delivery.TenantId), cancellationToken);
+
             return Result<Guid>.Success(delivery.Id);
         }
     }

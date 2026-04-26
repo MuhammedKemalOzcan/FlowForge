@@ -14,7 +14,7 @@ namespace FlowForge.Infrastructure.Services
         {
             _httpClient = httpClient;
         }
-
+        
         public async Task<WebhookSendResult> SendAsync(string url, string payload, string signingSecret, string eventType, Guid deliveryId)
         {
             var startedAt = DateTime.UtcNow;
@@ -64,6 +64,15 @@ namespace FlowForge.Infrastructure.Services
                 return WebhookSendResult.Failure(
                     null, stopWatch.ElapsedMilliseconds,
                     ex.Message, startedAt, DateTime.UtcNow);
+            }
+            catch (Polly.CircuitBreaker.BrokenCircuitException ex)
+            {
+                // 503 döndüren endpointlerde circuit breaker devreye giriyor fakat state deadlettered olarak değiştirilmediğinden masstransit hata fırlatıyor.
+                stopWatch.Stop();
+                return WebhookSendResult.Failure(
+                    null, stopWatch.ElapsedMilliseconds,
+                    "Circuit breaker is open - endpoint appears to be down",
+                    startedAt, DateTime.UtcNow);
             }
         }
 
