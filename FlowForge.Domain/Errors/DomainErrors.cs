@@ -54,7 +54,9 @@
 
         public static class ApiKey
         {
-            public static Error AlreadyRevoked => Error.Validation("ApiKey.AlreadyRevoked", "This key is already revoked cannot be revoked again.");
+            public static Error AlreadyRevoked => Error.Conflict("ApiKey.AlreadyRevoked", "This key is already revoked cannot be revoked again.");
+            public static Error NotFound => Error.NotFound("ApiKey.NotFound", "Key not found!");
+            public static Error Revoked => Error.NotFound("ApiKey.Revoked", "Key is revoked!");
         }
 
         public static class Email
@@ -71,12 +73,14 @@
             public static Error MemberCannotFound => Error.NotFound("Tenant.MemberCannotFound", "This user is not a member.");
             public static Error TenantCannotFound => Error.NotFound("Tenant.TenantCannotFound", "Tenant cannot be found!");
             public static Error OwnerCannotBeRemoved => Error.Forbidden("Tenant.OwnerCannotBeRemoved", "Owner cannot be removed.");
+            public static Error RateLimitExceeded => Error.LimitExceeded("Tenant.RateLimitExceeded", "Limit Exceeded.");
         }
 
         public static class WebhookDelivery
         {
             public static Error DeliveryNotFound => Error.NotFound("Delivery.DeliveryNotFound", "Delivery cannot be found!");
             public static Error NotInPendingState => Error.BadRequest("Delivery.NotInPendingState", "Webhooks that are not pending cannot be processed.");
+            public static Error NotInQueuedState => Error.BadRequest("Delivery.NotInQueuedState", "Webhooks that are not queued cannot be processed.");
         }
     }
 }

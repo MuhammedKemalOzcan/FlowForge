@@ -36,7 +36,7 @@ namespace FlowForge.Domain.Entities
                 Id = Guid.NewGuid(),
                 TenantId = tenantId,
                 Key = hashedKey,
-                Name = name,
+                Name = name.Trim(),
                 Prefix = plainKeysPrefix,
                 Status = KeyStatus.Active,
                 CreatedAt = DateTime.UtcNow,

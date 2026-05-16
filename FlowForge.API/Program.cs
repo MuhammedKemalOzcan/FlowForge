@@ -1,6 +1,8 @@
+using FlowForge.API.Authentication;
 using FlowForge.API.BackgroundServices;
 using FlowForge.Application;
 using FlowForge.Infrastructure;
+using FlowForge.Infrastructure.Authentication;
 using FlowForge.Persistence;
 
 namespace FlowForge.API
@@ -21,6 +23,18 @@ namespace FlowForge.API
             builder.Services.AddPersistenceServices(builder.Configuration);
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices(builder.Configuration);
+
+            //Authentication handler DI Registration
+
+            builder.Services
+                .AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = ApiKeyAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = ApiKeyAuthenticationDefaults.AuthenticationScheme;
+                })
+                .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(
+                ApiKeyAuthenticationDefaults.AuthenticationScheme,
+                options => { });
 
             builder.Services.AddHostedService<DeliveryProcessorWorker>();
 
