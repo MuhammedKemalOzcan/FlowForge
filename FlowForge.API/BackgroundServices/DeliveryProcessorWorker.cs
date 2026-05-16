@@ -21,6 +21,7 @@ namespace FlowForge.API.BackgroundServices
                 {
                     var repo = scope.ServiceProvider.GetRequiredService<IWebhookDeliveryRepository>();
                     var publishEndpoint = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
+                    var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
                     var deliveries = await repo.GetPendingDeliveriesAsync();
 
@@ -28,6 +29,9 @@ namespace FlowForge.API.BackgroundServices
                     {
                         try
                         {
+                            delivery.MarkQueued();
+                            await unitOfWork.SaveChangesAsync(stoppingToken);
+
                             await publishEndpoint.Publish(
                                 new ProcessWebhookDeliveryMessage(delivery.Id, delivery.TenantId), stoppingToken);
                         }

@@ -3,6 +3,7 @@
     public enum DeliveryStatus
     {
         Pending,
+        Queued,
         InProgress,
         Succeeded,
         DeadLettered

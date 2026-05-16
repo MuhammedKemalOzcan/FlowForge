@@ -1,9 +1,7 @@
-﻿using FlowForge.Application.Messages;
-using FlowForge.Domain.Enums;
+﻿using FlowForge.Domain.Enums;
 using FlowForge.Domain.Errors;
 using FlowForge.Domain.Repositories;
 using FlowForge.Domain.Services;
-using MassTransit;
 using MediatR;
 
 namespace FlowForge.Application.Features.Commands.WebhookDeliveryCommands.ProcessWebhookDelivery
@@ -31,9 +29,10 @@ namespace FlowForge.Application.Features.Commands.WebhookDeliveryCommands.Proces
             var endpoint = await _endpointRepository.GetByIdAsync(delivery.EndpointId, request.TenantId);
             if (endpoint is null) return Result.Failure(DomainErrors.WebhookEndpoint.NotFound);
 
-            if (delivery.Status != DeliveryStatus.Pending) return Result.Failure(DomainErrors.WebhookDelivery.NotInPendingState);
+            if (delivery.Status != DeliveryStatus.Queued) return Result.Failure(DomainErrors.WebhookDelivery.NotInQueuedState);
 
             delivery.MarkInProgress();
+            await _unitOfWork.SaveChangesAsync();
 
             var signature = endpoint.SigningSecret.ComputeSignature(delivery.Payload);
 

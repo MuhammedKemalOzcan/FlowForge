@@ -1,11 +1,14 @@
-﻿using FlowForge.Application.Consumers;
+﻿using FlowForge.Application.Abstractions;
+using FlowForge.Application.Consumers;
 using FlowForge.Domain.Services;
+using FlowForge.Infrastructure.Authentication;
 using FlowForge.Infrastructure.Services;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.Extensions.Http;
+using StackExchange.Redis;
 
 namespace FlowForge.Infrastructure
 {
@@ -17,6 +20,16 @@ namespace FlowForge.Infrastructure
                 .AddPolicyHandler(GetRetryPolicy())
                 .AddPolicyHandler(GetCircuitBreakerPolicy())
                 .AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromSeconds(30)));
+
+            //IConnectionMultiplexer Redis'e bağlantıyı yönetiyor — singleton olarak kayıt doğru çünkü tek bir bağlantı havuzu yönetir, her request'te yeni bağlantı açmaz.
+            services.AddSingleton<IConnectionMultiplexer>(sp =>
+            ConnectionMultiplexer.Connect(configuration["Redis:ConnectionString"]));
+
+            services.AddScoped<IRateLimiter, RedisRateLimiter>();
+            services.AddHttpContextAccessor();
+            services.AddScoped<ICurrentTenant, CurrentTenant>();
+            services.AddScoped<IApiKeyValidator, ApiKeyValidator>();
+            services.AddScoped<IApiKeyValidationCache, ApiKeyValidationCache>();
 
             services.AddMassTransit(bus =>
             {
@@ -45,8 +58,6 @@ namespace FlowForge.Infrastructure
                 {
                     Console.WriteLine($"Polly Retry {retryAttempt} after {timespan.TotalSeconds:F1}s - Status: {outcome.Result?.StatusCode}");
                 });
-                
-                
         }
 
         private static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy()

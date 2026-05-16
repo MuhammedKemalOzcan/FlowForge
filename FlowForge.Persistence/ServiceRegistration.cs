@@ -18,13 +18,12 @@ namespace FlowForge.Persistence
                 options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
             });
 
-            
-
             services.AddScoped<ITenantRepository, TenantRepository>();
             services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<FlowForgeAPIDbContext>());
             services.AddScoped<IFlowForgeApiDbContext>(provider => provider.GetRequiredService<FlowForgeAPIDbContext>());
             services.AddScoped<IWebhookEndpointRepository, WebhookEndpointRepository>();
             services.AddScoped<IWebhookDeliveryRepository, WebhookDeliveryRepository>();
+            services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
         }
     }
 }

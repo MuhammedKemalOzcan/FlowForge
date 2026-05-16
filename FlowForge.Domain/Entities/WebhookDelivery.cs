@@ -17,6 +17,7 @@ namespace FlowForge.Domain.Entities
         public DateTime ReceivedAt { get; private set; }
         public DateTime? NextRetryAt { get; private set; }
         public DateTime? FinalResultAt { get; private set; }
+        public DateTime? UpdatedAt { get; private set; }
 
         private List<DeliveryAttempt> _attempts = new();
         public IReadOnlyCollection<DeliveryAttempt> Attempts => _attempts.AsReadOnly();
@@ -90,10 +91,20 @@ namespace FlowForge.Domain.Entities
 
         public void MarkInProgress()
         {
-            if (Status != DeliveryStatus.Pending)
+            if (Status != DeliveryStatus.Queued)
                 throw new InvalidOperationException($"Cannot mark as InProgress from {Status} state.");
 
             Status = DeliveryStatus.InProgress;
+            UpdatedAt = DateTime.UtcNow;
+        }
+
+        public void MarkQueued()
+        {
+            if (Status != DeliveryStatus.Pending)
+                throw new InvalidOperationException($"Cannot mark as Queued from {Status} state.");
+
+            Status = DeliveryStatus.Queued;
+            UpdatedAt = DateTime.UtcNow;
         }
 
         private void MarkDeadLettered()
@@ -103,6 +114,7 @@ namespace FlowForge.Domain.Entities
             Status = DeliveryStatus.DeadLettered;
             FinalResultAt = DateTime.UtcNow;
             NextRetryAt = null;
+            UpdatedAt = DateTime.UtcNow;
         }
 
         private void MarkAsSucceeded()
@@ -112,6 +124,7 @@ namespace FlowForge.Domain.Entities
                 Status = DeliveryStatus.Succeeded;
                 FinalResultAt = DateTime.UtcNow;
                 NextRetryAt = null;
+                UpdatedAt = DateTime.UtcNow;
             }
             else
             {
