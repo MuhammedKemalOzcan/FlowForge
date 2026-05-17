@@ -1,4 +1,5 @@
-﻿using FlowForge.Domain.Errors;
+﻿using FlowForge.Application.Abstractions;
+using FlowForge.Domain.Errors;
 using FlowForge.Domain.Repositories;
 using FlowForge.Domain.ValueObjects;
 using MediatR;
@@ -9,16 +10,20 @@ namespace FlowForge.Application.Features.Commands.WebhookEndpoint.ChangeEndpoint
     {
         private readonly IWebhookEndpointRepository _endpointRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICurrentTenant _currentTenant;
 
-        public ChangeEndpointRetryPolicyCommandHandler(IWebhookEndpointRepository endpointRepository, IUnitOfWork unitOfWork)
+        public ChangeEndpointRetryPolicyCommandHandler(IWebhookEndpointRepository endpointRepository, IUnitOfWork unitOfWork, ICurrentTenant currentTenant)
         {
             _endpointRepository = endpointRepository;
             _unitOfWork = unitOfWork;
+            _currentTenant = currentTenant;
         }
 
         public async Task<Result> Handle(ChangeEndpointRetryPolicyCommand request, CancellationToken cancellationToken)
         {
-            var endpoint = await _endpointRepository.GetByIdAsync(request.EndpointId, request.TenantId);
+            var tenantId = _currentTenant.GetRequiredTenantId();
+
+            var endpoint = await _endpointRepository.GetByIdAsync(request.EndpointId, tenantId);
 
             if (endpoint is null) return Result.Failure(DomainErrors.WebhookEndpoint.NotFound);
 

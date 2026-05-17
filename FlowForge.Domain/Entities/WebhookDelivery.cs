@@ -27,9 +27,9 @@ namespace FlowForge.Domain.Entities
 
         public static WebhookDelivery Create(Guid tenantId, Guid endpointId, EventType eventType, string payload, IdempotencyKey idempotencyKey, RetryPolicy retryPolicy)
         {
-            if (tenantId == Guid.Empty) throw new ArgumentException("Tenant cannot be found");
-            if (endpointId == Guid.Empty) throw new ArgumentException("Endpoint cannot be found");
-            if (eventType is null) throw new ArgumentException(nameof(eventType));
+            if (tenantId == Guid.Empty) throw new ArgumentException("Tenant id cannot be empty", nameof(tenantId));
+            if (endpointId == Guid.Empty) throw new ArgumentException("Endpoint id cannot be empty", nameof(endpointId));
+            if (eventType is null) throw new ArgumentNullException(nameof(eventType));
             if (string.IsNullOrEmpty(payload)) throw new ArgumentException("Payload cannot be null");
             if (idempotencyKey is null) throw new ArgumentException(nameof(idempotencyKey));
             if (retryPolicy is null) throw new ArgumentException(nameof(retryPolicy));
@@ -114,6 +114,15 @@ namespace FlowForge.Domain.Entities
             Status = DeliveryStatus.DeadLettered;
             FinalResultAt = DateTime.UtcNow;
             NextRetryAt = null;
+            UpdatedAt = DateTime.UtcNow;
+        }
+
+        public void RecoverStuckToPending()
+        {
+            if (Status != DeliveryStatus.Queued && Status != DeliveryStatus.InProgress)
+                throw new InvalidOperationException($"Cannot recover as pending from {Status} state.");
+
+            Status = DeliveryStatus.Pending;
             UpdatedAt = DateTime.UtcNow;
         }
 

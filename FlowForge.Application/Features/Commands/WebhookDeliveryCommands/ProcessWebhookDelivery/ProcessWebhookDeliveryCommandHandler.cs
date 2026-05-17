@@ -1,4 +1,5 @@
-﻿using FlowForge.Domain.Enums;
+﻿using FlowForge.Application.Abstractions;
+using FlowForge.Domain.Enums;
 using FlowForge.Domain.Errors;
 using FlowForge.Domain.Repositories;
 using FlowForge.Domain.Services;
@@ -26,13 +27,14 @@ namespace FlowForge.Application.Features.Commands.WebhookDeliveryCommands.Proces
             var delivery = await _deliveryRepository.GetByIdAsync(request.DeliveryId, request.TenantId);
             if (delivery is null) return Result.Failure(DomainErrors.WebhookDelivery.DeliveryNotFound);
 
+            if (delivery.Status != DeliveryStatus.Queued) return Result.Failure(DomainErrors.WebhookDelivery.NotInQueuedState);
+
             var endpoint = await _endpointRepository.GetByIdAsync(delivery.EndpointId, request.TenantId);
             if (endpoint is null) return Result.Failure(DomainErrors.WebhookEndpoint.NotFound);
 
-            if (delivery.Status != DeliveryStatus.Queued) return Result.Failure(DomainErrors.WebhookDelivery.NotInQueuedState);
-
+            
             delivery.MarkInProgress();
-            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             var signature = endpoint.SigningSecret.ComputeSignature(delivery.Payload);
 
@@ -40,7 +42,8 @@ namespace FlowForge.Application.Features.Commands.WebhookDeliveryCommands.Proces
                 endpoint.TargetUrl.Value,
                 delivery.Payload, signature,
                 delivery.EventType.Value,
-                delivery.Id);
+                delivery.Id,
+                cancellationToken);
 
             if (result.IsSuccess)
             {

@@ -5,5 +5,5 @@ using MediatR;
 
 namespace FlowForge.Application.Features.Queries.WebhookEndpointQuery.GetAllEndpoints
 {
-    public record GetAllEndpointsQuery(Guid TenantId) : IRequest<Result<List<WebhookEndpointDto>>>;
+    public record GetAllEndpointsQuery() : IRequest<Result<List<WebhookEndpointDto>>>;
 }

@@ -27,7 +27,7 @@ namespace FlowForge.Persistence.Repositories
                 .ToListAsync();
         }
 
-        public async Task<WebhookEndpoint?> GetByIdAsync(Guid id, Guid tenantId)
+        public async Task<WebhookEndpoint?> GetByIdAsync(Guid id, Guid tenantId,CancellationToken cancellationToken)
         {
             return await _context.WebhookEndpoints
                 .Include(x => x.SubscribedEventTypes)

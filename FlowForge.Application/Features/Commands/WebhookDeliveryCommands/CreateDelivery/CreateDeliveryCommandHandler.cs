@@ -41,16 +41,16 @@ namespace FlowForge.Application.Features.Commands.WebhookDeliveryCommands.Create
             var isAllowed = await _rateLimiter.IsAllowedAsync(tenant.Id, tenant.PlanLimits.MaxEventsPerMinute);
             if (!isAllowed) return Result<Guid>.Failure(DomainErrors.Tenant.RateLimitExceeded);
 
-            var existingDelivery = await _webhookDelivery.GetByIdempotencyKey(request.IdempotencyKey, tenantId);
-            if (existingDelivery is not null) return Result<Guid>.Success(existingDelivery.Id);
-
             var eventType = EventType.Create(request.EventType);
             if (!eventType.IsSuccess) return Result<Guid>.Failure(eventType.Error);
 
             var idempotencyKey = IdempotencyKey.Create(request.IdempotencyKey);
             if (!idempotencyKey.IsSuccess) return Result<Guid>.Failure(idempotencyKey.Error);
 
-            var endpoint = await _endpointRepository.GetByIdAsync(request.EndpointId, tenantId);
+            var existingDelivery = await _webhookDelivery.GetByIdempotencyKey(request.IdempotencyKey, tenantId);
+            if (existingDelivery is not null) return Result<Guid>.Success(existingDelivery.Id);
+
+            var endpoint = await _endpointRepository.GetByIdAsync(request.EndpointId, tenantId, cancellationToken);
 
             if (endpoint is null) return Result<Guid>.Failure(DomainErrors.WebhookEndpoint.NotFound);
             if (!endpoint.IsActive) return Result<Guid>.Failure(DomainErrors.WebhookEndpoint.EndpointNotActive);
@@ -64,6 +64,8 @@ namespace FlowForge.Application.Features.Commands.WebhookDeliveryCommands.Create
                     idempotencyKey.Data,
                     endpoint.RetryPolicy
                     );
+
+            delivery.MarkQueued();
 
             _webhookDelivery.Add(delivery);
             await _unitOfWork.SaveChangesAsync(cancellationToken);

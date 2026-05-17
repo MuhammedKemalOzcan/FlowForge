@@ -1,4 +1,5 @@
-﻿using FlowForge.Domain.Errors;
+﻿using FlowForge.Application.Abstractions;
+using FlowForge.Domain.Errors;
 using FlowForge.Domain.Repositories;
 using MediatR;
 
@@ -8,16 +9,20 @@ namespace FlowForge.Application.Features.Commands.WebhookEndpoint.RemoveEndpoint
     {
         private readonly IWebhookEndpointRepository _endpointRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICurrentTenant _currentTenant;
 
-        public RemoveEndpointCommandHandler(IWebhookEndpointRepository endpointRepository, IUnitOfWork unitOfWork)
+        public RemoveEndpointCommandHandler(IWebhookEndpointRepository endpointRepository, IUnitOfWork unitOfWork, ICurrentTenant currentTenant)
         {
             _endpointRepository = endpointRepository;
             _unitOfWork = unitOfWork;
+            _currentTenant = currentTenant;
         }
 
         public async Task<Result> Handle(RemoveEndpointCommand request, CancellationToken cancellationToken)
         {
-            var endpoint = await _endpointRepository.GetByIdAsync(request.Id, request.TenantId);
+            var tenantId = _currentTenant.GetRequiredTenantId();
+
+            var endpoint = await _endpointRepository.GetByIdAsync(request.Id, tenantId);
 
             if (endpoint is null) return Result.Failure(DomainErrors.WebhookEndpoint.NotFound);
 

@@ -15,7 +15,7 @@ namespace FlowForge.Infrastructure.Services
             _httpClient = httpClient;
         }
         
-        public async Task<WebhookSendResult> SendAsync(string url, string payload, string signingSecret, string eventType, Guid deliveryId)
+        public async Task<WebhookSendResult> SendAsync(string url, string payload, string signingSecret, string eventType, Guid deliveryId,CancellationToken cancellationToken)
         {
             var startedAt = DateTime.UtcNow;
             var stopWatch = Stopwatch.StartNew();
