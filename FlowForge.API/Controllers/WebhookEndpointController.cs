@@ -6,7 +6,9 @@ using FlowForge.Application.Features.Commands.WebhookEndpoint.CreateEndpoint;
 using FlowForge.Application.Features.Commands.WebhookEndpoint.RemoveEndpoint;
 using FlowForge.Application.Features.Queries.WebhookEndpointQuery.GetAllEndpoints;
 using FlowForge.Domain.Enums;
+using FlowForge.Infrastructure.Authentication;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FlowForge.API.Controllers
@@ -23,6 +25,7 @@ namespace FlowForge.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(AuthenticationSchemes = ApiKeyAuthenticationDefaults.AuthenticationScheme)]
         public async Task<IActionResult> GetEndpoints([FromQuery] GetAllEndpointsQuery query)
         {
             var result = await _mediator.Send(query);
@@ -30,6 +33,7 @@ namespace FlowForge.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(AuthenticationSchemes = ApiKeyAuthenticationDefaults.AuthenticationScheme)]
         public async Task<IActionResult> CreateEndpoint([FromBody] CreateWebhookEndpointCommand command)
         {
             var result = await _mediator.Send(command);
@@ -37,18 +41,17 @@ namespace FlowForge.API.Controllers
         }
 
         //Jwt eklendiğinde kaldırılacak tenantId Jwt üzerinden alınacak.
-        public record ChangeEndpointNameRequest(Guid TenantId, string EndpointName);
 
         [HttpPatch("{endpointId}/name")]
-        public async Task<IActionResult> ChangeEndpointName([FromBody] ChangeEndpointNameRequest request, [FromRoute] Guid endpointId)
+        [Authorize(AuthenticationSchemes = ApiKeyAuthenticationDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> ChangeEndpointName([FromBody] string endpointName, [FromRoute] Guid endpointId)
         {
-            var command = new ChangeEndpointNameCommand(request.EndpointName, endpointId, request.TenantId);
+            var command = new ChangeEndpointNameCommand(endpointName, endpointId);
             var result = await _mediator.Send(command);
             return HandleResult(result);
         }
 
         public record ChangeRetryPolicyRequest(
-            Guid TenantId,
             int MaxAttempts,
             BackoffStrategy Strategy,
             TimeSpan InitialDelay,
@@ -56,12 +59,12 @@ namespace FlowForge.API.Controllers
             TimeSpan TimeOut
             );
 
-        [HttpPatch("{endpointId}/retryPolicy")]
+        [HttpPatch("{endpointId}/retry-policy")]
+        [Authorize(AuthenticationSchemes = ApiKeyAuthenticationDefaults.AuthenticationScheme)]
         public async Task<IActionResult> ChangeRetryPolicy([FromRoute] Guid endpointId, [FromBody] ChangeRetryPolicyRequest request)
         {
             var command = new ChangeEndpointRetryPolicyCommand(
                 endpointId,
-                request.TenantId,
                 request.MaxAttempts,
                 request.Strategy,
                 request.InitialDelay,
@@ -72,30 +75,28 @@ namespace FlowForge.API.Controllers
             return HandleResult(result);
         }
 
-        public record ChangeEndpointSubscriptionRequest(Guid TenantId, List<string> EventTypes);
-
         [HttpPatch("{endpointId}/subscriptions")]
-        public async Task<IActionResult> ChangeEndpointSubscriptions([FromRoute] Guid endpointId, [FromBody] ChangeEndpointSubscriptionRequest request)
+        [Authorize(AuthenticationSchemes = ApiKeyAuthenticationDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> ChangeEndpointSubscriptions([FromRoute] Guid endpointId, [FromBody] List<string> eventTypes)
         {
-            var command = new ChangeEndpointSubscriptionsCommand(endpointId, request.TenantId, request.EventTypes);
+            var command = new ChangeEndpointSubscriptionsCommand(endpointId, eventTypes);
             var result = await _mediator.Send(command);
             return HandleResult(result);
         }
 
-        public record ChangeEndpointUrlRequest(Guid TenantId, string Url);
-
         [HttpPatch("{endpointId}/url")]
-        public async Task<IActionResult> ChangeEndpointUrl([FromBody] ChangeEndpointUrlRequest request, [FromRoute] Guid endpointId)
+        [Authorize(AuthenticationSchemes = ApiKeyAuthenticationDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> ChangeEndpointUrl([FromBody] string url, [FromRoute] Guid endpointId)
         {
-            var command = new ChangeEndpointUrlCommand(request.Url, endpointId, request.TenantId);
+            var command = new ChangeEndpointUrlCommand(url, endpointId);
             var result = await _mediator.Send(command);
             return HandleResult(result);
         }
 
         [HttpDelete("{endpointId}")]
-        public async Task<IActionResult> RemoveEndpoint([FromBody] Guid tenantId, [FromRoute] Guid endpointId)
+        [Authorize(AuthenticationSchemes = ApiKeyAuthenticationDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> RemoveEndpoint([FromRoute] RemoveEndpointCommand command)
         {
-            var command = new RemoveEndpointCommand(tenantId, endpointId);
             var result = await _mediator.Send(command);
             return HandleResult(result);
         }

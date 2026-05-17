@@ -4,5 +4,6 @@ using MediatR;
 
 namespace FlowForge.Application.Features.Queries.WebhookDeliveriesQuery
 {
-    public record WebhookDeliveryQuery(Guid TenantId) : IRequest<Result<List<WebhookDeliveryDto>>>;
+    //TODO: pagination eklenecek.
+    public record WebhookDeliveryQuery() : IRequest<Result<List<WebhookDeliveryDto>>>;
 }

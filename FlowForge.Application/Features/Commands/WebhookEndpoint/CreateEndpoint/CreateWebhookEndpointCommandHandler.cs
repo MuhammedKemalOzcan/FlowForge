@@ -1,4 +1,5 @@
-﻿using FlowForge.Domain.Errors;
+﻿using FlowForge.Application.Abstractions;
+using FlowForge.Domain.Errors;
 using FlowForge.Domain.Repositories;
 using FlowForge.Domain.ValueObjects;
 using MediatR;
@@ -9,15 +10,19 @@ namespace FlowForge.Application.Features.Commands.WebhookEndpoint.CreateEndpoint
     {
         private readonly IWebhookEndpointRepository _endpointRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICurrentTenant _currentTenant;
 
-        public CreateWebhookEndpointCommandHandler(IWebhookEndpointRepository endpointRepository, IUnitOfWork unitOfWork)
+        public CreateWebhookEndpointCommandHandler(IWebhookEndpointRepository endpointRepository, IUnitOfWork unitOfWork, ICurrentTenant currentTenant)
         {
             _endpointRepository = endpointRepository;
             _unitOfWork = unitOfWork;
+            _currentTenant = currentTenant;
         }
 
         public async Task<Result<Guid>> Handle(CreateWebhookEndpointCommand request, CancellationToken cancellationToken)
         {
+            var tenantId = _currentTenant.GetRequiredTenantId();
+
             var endpointName = EndpointName.Create(request.EndpointName);
             if (!endpointName.IsSuccess) return Result<Guid>.Failure(endpointName.Error);
 
@@ -45,7 +50,7 @@ namespace FlowForge.Application.Features.Commands.WebhookEndpoint.CreateEndpoint
             if (!retryPolicy.IsSuccess) return Result<Guid>.Failure(retryPolicy.Error);
 
             var endpoint = Domain.Entities.WebhookEndpoint.Create(
-                request.TenantId,
+                tenantId,
                 endpointName.Data,
                 url.Data,
                 eventTypes,

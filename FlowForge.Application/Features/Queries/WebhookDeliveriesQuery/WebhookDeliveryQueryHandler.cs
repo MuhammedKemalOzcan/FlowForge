@@ -1,4 +1,5 @@
-﻿using FlowForge.Application.Data;
+﻿using FlowForge.Application.Abstractions;
+using FlowForge.Application.Data;
 using FlowForge.Application.Dtos;
 using FlowForge.Domain.Errors;
 using MediatR;
@@ -9,17 +10,21 @@ namespace FlowForge.Application.Features.Queries.WebhookDeliveriesQuery
     public class WebhookDeliveryQueryHandler : IRequestHandler<WebhookDeliveryQuery, Result<List<WebhookDeliveryDto>>>
     {
         private readonly IFlowForgeApiDbContext _context;
+        private readonly ICurrentTenant _currentTenant;
 
-        public WebhookDeliveryQueryHandler(IFlowForgeApiDbContext context)
+        public WebhookDeliveryQueryHandler(IFlowForgeApiDbContext context, ICurrentTenant currentTenant)
         {
             _context = context;
+            _currentTenant = currentTenant;
         }
 
         public async Task<Result<List<WebhookDeliveryDto>>> Handle(WebhookDeliveryQuery request, CancellationToken cancellationToken)
         {
-            var delivery = await _context.WebhookDeliveries
+            var tenantId = _currentTenant.GetRequiredTenantId();
+
+            var deliveries = await _context.WebhookDeliveries
                 .AsNoTracking()
-                .Where(x => x.TenantId == request.TenantId)
+                .Where(x => x.TenantId == tenantId)
                 .Select(x => new WebhookDeliveryDto
                 {
                     Id = x.Id,
@@ -52,7 +57,7 @@ namespace FlowForge.Application.Features.Queries.WebhookDeliveriesQuery
                     .ToList()
                 }).ToListAsync(cancellationToken);
 
-            return Result<List<WebhookDeliveryDto>>.Success(delivery);
+            return Result<List<WebhookDeliveryDto>>.Success(deliveries);
         }
     }
 }

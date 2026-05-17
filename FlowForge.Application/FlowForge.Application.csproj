@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Features\Queries\TenantsQuery\**" />
+    <EmbeddedResource Remove="Features\Queries\TenantsQuery\**" />
+    <None Remove="Features\Queries\TenantsQuery\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MassTransit" Version="9.1.0" />
     <PackageReference Include="MediatR" Version="14.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.26" />
@@ -14,10 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FlowForge.Domain\FlowForge.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Features\Queries\TenantsQuery\" />
   </ItemGroup>
 
 </Project>

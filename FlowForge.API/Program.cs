@@ -37,6 +37,7 @@ namespace FlowForge.API
                 options => { });
 
             builder.Services.AddHostedService<DeliveryProcessorWorker>();
+            builder.Services.AddHostedService<DeliveryRecoveryWorker>();
 
             var app = builder.Build();
 

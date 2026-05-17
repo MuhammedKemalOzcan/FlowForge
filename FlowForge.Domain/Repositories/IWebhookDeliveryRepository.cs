@@ -1,13 +1,16 @@
 ﻿using FlowForge.Domain.Entities;
-using FlowForge.Domain.Enums;
 
 namespace FlowForge.Domain.Repositories
 {
     public interface IWebhookDeliveryRepository
     {
-        Task<List<WebhookDelivery>> GetPendingDeliveriesAsync();
+        Task<List<WebhookDelivery>> GetPendingDeliveriesAsync(CancellationToken cancellationToken);
 
-        Task<WebhookDelivery?> GetByIdAsync(Guid Id, Guid tenantId);
+        Task<List<WebhookDelivery>> GetQueuedStuckDeliveriesAsync(DateTime threshold, CancellationToken cancellationToken);
+
+        Task<List<WebhookDelivery>> GetInProgressStuckDeliveriesAsync(DateTime threshold, CancellationToken cancellationToken);
+
+        Task<WebhookDelivery?> GetByIdAsync(Guid Id, Guid tenantId,CancellationToken cancellationToken = default);
 
         Task<WebhookDelivery?> GetByIdempotencyKey(string idempotencyKey, Guid tenantId);
 

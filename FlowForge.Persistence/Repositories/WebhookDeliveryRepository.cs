@@ -20,7 +20,7 @@ namespace FlowForge.Persistence.Repositories
             _context.Add(delivery);
         }
 
-        public async Task<WebhookDelivery?> GetByIdAsync(Guid id, Guid tenantId)
+        public async Task<WebhookDelivery?> GetByIdAsync(Guid id, Guid tenantId,CancellationToken cancellationToken)
         {
             return await _context.WebhookDeliveries
                 .Include(x => x.Attempts)
@@ -34,11 +34,27 @@ namespace FlowForge.Persistence.Repositories
                 .FirstOrDefaultAsync(x => x.IdempotencyKey.Value == idempotencyKey && x.TenantId == tenantId);
         }
 
-        public async Task<List<WebhookDelivery>> GetPendingDeliveriesAsync()
+        public async Task<List<WebhookDelivery>> GetInProgressStuckDeliveriesAsync(DateTime threshold, CancellationToken cancellationToken)
         {
             return await _context.WebhookDeliveries
                 .AsNoTracking()
+                .Where(x => x.Status == DeliveryStatus.InProgress && x.UpdatedAt < threshold)
+                .Take(50)
+                .ToListAsync();
+        }
+
+        public async Task<List<WebhookDelivery>> GetPendingDeliveriesAsync(CancellationToken cancellationToken)
+        {
+            return await _context.WebhookDeliveries
                 .Where(x => x.Status == DeliveryStatus.Pending && (x.NextRetryAt == null || x.NextRetryAt <= DateTime.UtcNow))
+                .Take(50)
+                .ToListAsync();
+        }
+
+        public async Task<List<WebhookDelivery>> GetQueuedStuckDeliveriesAsync(DateTime threshold, CancellationToken cancellationToken)
+        {
+            return await _context.WebhookDeliveries
+                .Where(x => x.Status == DeliveryStatus.Queued && x.UpdatedAt < threshold)
                 .Take(50)
                 .ToListAsync();
         }

@@ -4,7 +4,7 @@ namespace FlowForge.Domain.Repositories
 {
     public interface IWebhookEndpointRepository
     {
-        Task<WebhookEndpoint?> GetByIdAsync(Guid id, Guid tenantId);
+        Task<WebhookEndpoint?> GetByIdAsync(Guid id, Guid tenantId,CancellationToken cancellationToken);
 
         Task<List<WebhookEndpoint>> GetAllAsync(Guid tenantId);
 
