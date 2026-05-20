@@ -30,6 +30,7 @@ namespace FlowForge.Infrastructure
             services.AddScoped<ICurrentTenant, CurrentTenant>();
             services.AddScoped<IApiKeyValidator, ApiKeyValidator>();
             services.AddScoped<IApiKeyValidationCache, ApiKeyValidationCache>();
+            services.AddScoped<ICorrelationContext, CorrelationContext>();
 
             services.AddMassTransit(bus =>
             {

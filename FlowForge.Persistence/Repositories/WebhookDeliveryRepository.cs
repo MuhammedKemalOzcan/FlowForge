@@ -37,8 +37,8 @@ namespace FlowForge.Persistence.Repositories
         public async Task<List<WebhookDelivery>> GetInProgressStuckDeliveriesAsync(DateTime threshold, CancellationToken cancellationToken)
         {
             return await _context.WebhookDeliveries
-                .AsNoTracking()
                 .Where(x => x.Status == DeliveryStatus.InProgress && x.UpdatedAt < threshold)
+                .OrderBy(x => x.UpdatedAt)
                 .Take(50)
                 .ToListAsync();
         }
@@ -47,6 +47,7 @@ namespace FlowForge.Persistence.Repositories
         {
             return await _context.WebhookDeliveries
                 .Where(x => x.Status == DeliveryStatus.Pending && (x.NextRetryAt == null || x.NextRetryAt <= DateTime.UtcNow))
+                .OrderBy(x => x.NextRetryAt ?? x.ReceivedAt)
                 .Take(50)
                 .ToListAsync();
         }
@@ -55,6 +56,7 @@ namespace FlowForge.Persistence.Repositories
         {
             return await _context.WebhookDeliveries
                 .Where(x => x.Status == DeliveryStatus.Queued && x.UpdatedAt < threshold)
+                .OrderBy(x => x.UpdatedAt)
                 .Take(50)
                 .ToListAsync();
         }

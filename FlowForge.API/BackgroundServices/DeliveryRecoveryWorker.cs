@@ -50,6 +50,7 @@ namespace FlowForge.API.BackgroundServices
         {
             using (var scope = _scopeFactory.CreateScope())
             {
+                _logger.LogInformation("Recovery cycle Started.");
                 var repo = scope.ServiceProvider.GetRequiredService<IWebhookDeliveryRepository>();
                 var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
@@ -60,6 +61,9 @@ namespace FlowForge.API.BackgroundServices
                 var queuedDeliveries = await repo.GetQueuedStuckDeliveriesAsync(queuedThreshold, cancellationToken);
                 var inProgressDeliveries = await repo.GetInProgressStuckDeliveriesAsync(inProgressThreshold, cancellationToken);
 
+                _logger.LogInformation("Found {count} queued deliveries.", queuedDeliveries.Count);
+                _logger.LogInformation("Found {count} in progress deliveries.", inProgressDeliveries.Count);
+
                 var hasChanges = false;
 
                 foreach (var queued in queuedDeliveries)
@@ -68,12 +72,15 @@ namespace FlowForge.API.BackgroundServices
                     {
                         queued.RecoverStuckToPending();
                         hasChanges = true;
+                        _logger.LogInformation(
+                        "Recovered stuck delivery {DeliveryId} from Queued to Pending",
+                        queued.Id);
                     }
                     catch (Exception ex)
                     {
                         _logger.LogWarning(
                             ex,
-                            "Recovered stuck delivery {DeliveryId} from {StuckState} to Pending.",
+                            "Failed to stuck delivery {DeliveryId} from {StuckState}.",
                             queued.Id,
                             queued.Status);
                     }
@@ -84,16 +91,21 @@ namespace FlowForge.API.BackgroundServices
                     {
                         inProgress.RecoverStuckToPending();
                         hasChanges = true;
+                        _logger.LogInformation(
+                        "Recovered stuck delivery {DeliveryId} from Queued to Pending",
+                        inProgress.Id);
                     }
                     catch (Exception ex)
                     {
                         _logger.LogWarning(
                             ex,
-                            "Recovered stuck delivery {DeliveryId} from {StuckState} to Pending.",
+                            "Failed to stuck delivery {DeliveryId} from {StuckState}.",
                             inProgress.Id,
                             inProgress.Status);
                     }
                 }
+
+                _logger.LogInformation("recover cycle completed.");
                 if (hasChanges)
                 {
                     await unitOfWork.SaveChangesAsync(cancellationToken);
