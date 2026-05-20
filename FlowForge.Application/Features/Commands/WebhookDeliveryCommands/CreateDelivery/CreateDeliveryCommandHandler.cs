@@ -19,8 +19,9 @@ namespace FlowForge.Application.Features.Commands.WebhookDeliveryCommands.Create
         private readonly IRateLimiter _rateLimiter;
         private readonly ITenantRepository _tenantRepository;
         private readonly ICurrentTenant _currentTenant;
+        private readonly ICorrelationContext _correlationContext;
 
-        public CreateDeliveryCommandHandler(IWebhookDeliveryRepository webhookDelivery, IUnitOfWork unitOfWork, IWebhookEndpointRepository endpointRepository, IPublishEndpoint publishEndpoint, IRateLimiter rateLimiter, ITenantRepository tenantRepository, ICurrentTenant currentTenant)
+        public CreateDeliveryCommandHandler(IWebhookDeliveryRepository webhookDelivery, IUnitOfWork unitOfWork, IWebhookEndpointRepository endpointRepository, IPublishEndpoint publishEndpoint, IRateLimiter rateLimiter, ITenantRepository tenantRepository, ICurrentTenant currentTenant, ICorrelationContext correlationContext)
         {
             _webhookDelivery = webhookDelivery;
             _unitOfWork = unitOfWork;
@@ -29,6 +30,7 @@ namespace FlowForge.Application.Features.Commands.WebhookDeliveryCommands.Create
             _rateLimiter = rateLimiter;
             _tenantRepository = tenantRepository;
             _currentTenant = currentTenant;
+            _correlationContext = correlationContext;
         }
 
         public async Task<Result<Guid>> Handle(CreateDeliveryCommand request, CancellationToken cancellationToken)
@@ -44,11 +46,11 @@ namespace FlowForge.Application.Features.Commands.WebhookDeliveryCommands.Create
             var eventType = EventType.Create(request.EventType);
             if (!eventType.IsSuccess) return Result<Guid>.Failure(eventType.Error);
 
-            var idempotencyKey = IdempotencyKey.Create(request.IdempotencyKey);
-            if (!idempotencyKey.IsSuccess) return Result<Guid>.Failure(idempotencyKey.Error);
-
             var existingDelivery = await _webhookDelivery.GetByIdempotencyKey(request.IdempotencyKey, tenantId);
             if (existingDelivery is not null) return Result<Guid>.Success(existingDelivery.Id);
+
+            var idempotencyKey = IdempotencyKey.Create(request.IdempotencyKey);
+            if (!idempotencyKey.IsSuccess) return Result<Guid>.Failure(idempotencyKey.Error);
 
             var endpoint = await _endpointRepository.GetByIdAsync(request.EndpointId, tenantId, cancellationToken);
 
@@ -62,15 +64,19 @@ namespace FlowForge.Application.Features.Commands.WebhookDeliveryCommands.Create
                     eventType.Data,
                     request.Payload,
                     idempotencyKey.Data,
-                    endpoint.RetryPolicy
+                    endpoint.RetryPolicy with { }
                     );
+            //with {} => record copy
 
             delivery.MarkQueued();
 
             _webhookDelivery.Add(delivery);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            await _publishEndpoint.Publish(new ProcessWebhookDeliveryMessage(delivery.Id, delivery.TenantId), cancellationToken);
+            await _publishEndpoint.Publish(
+                new ProcessWebhookDeliveryMessage(delivery.Id, delivery.TenantId),
+                context => context.CorrelationId = _correlationContext.CorrelationId, 
+                cancellationToken);
 
             return Result<Guid>.Success(delivery.Id);
         }

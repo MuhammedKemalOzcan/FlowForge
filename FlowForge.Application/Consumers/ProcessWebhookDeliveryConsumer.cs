@@ -16,9 +16,16 @@ namespace FlowForge.Application.Consumers
 
         public async Task Consume(ConsumeContext<ProcessWebhookDeliveryMessage> context)
         {
-            var message = context.Message;
-            var command = new ProcessWebhookDeliveryCommand(message.DeliveryId, message.TenantId);
-            await _mediator.Send(command);
+            var correlationId = context.CorrelationId ?? Guid.NewGuid();
+
+            using (Serilog.Context.LogContext.PushProperty("CorrelationId", correlationId))
+            {
+                var message = context.Message;
+
+                var command = new ProcessWebhookDeliveryCommand(message.DeliveryId, message.TenantId);
+
+                await _mediator.Send(command, context.CancellationToken);
+            }
         }
     }
 }

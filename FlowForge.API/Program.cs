@@ -1,9 +1,13 @@
 using FlowForge.API.Authentication;
 using FlowForge.API.BackgroundServices;
+using FlowForge.API.Behaviors;
+using FlowForge.API.Middlewares;
 using FlowForge.Application;
 using FlowForge.Infrastructure;
 using FlowForge.Infrastructure.Authentication;
 using FlowForge.Persistence;
+using MediatR;
+using Serilog;
 
 namespace FlowForge.API
 {
@@ -24,8 +28,11 @@ namespace FlowForge.API
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices(builder.Configuration);
 
-            //Authentication handler DI Registration
+            //Serilog iþlemleri
+            builder.Host.UseSerilog((context, configuration) =>
+                configuration.ReadFrom.Configuration(context.Configuration));
 
+            //Authentication handler DI Registration
             builder.Services
                 .AddAuthentication(options =>
                 {
@@ -39,6 +46,9 @@ namespace FlowForge.API
             builder.Services.AddHostedService<DeliveryProcessorWorker>();
             builder.Services.AddHostedService<DeliveryRecoveryWorker>();
 
+            builder.Services.AddScoped(typeof(IPipelineBehavior<,>),
+                typeof(LoggingPipelineBehavior<,>));
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -49,6 +59,8 @@ namespace FlowForge.API
             }
 
             app.UseHttpsRedirection();
+
+            app.UseMiddleware<CorrelationIdMiddleware>();
 
             app.UseAuthorization();
 

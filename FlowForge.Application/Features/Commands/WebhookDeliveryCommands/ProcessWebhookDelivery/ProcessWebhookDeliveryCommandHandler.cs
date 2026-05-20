@@ -29,7 +29,7 @@ namespace FlowForge.Application.Features.Commands.WebhookDeliveryCommands.Proces
 
             if (delivery.Status != DeliveryStatus.Queued) return Result.Failure(DomainErrors.WebhookDelivery.NotInQueuedState);
 
-            var endpoint = await _endpointRepository.GetByIdAsync(delivery.EndpointId, request.TenantId);
+            var endpoint = await _endpointRepository.GetByIdAsync(delivery.EndpointId, request.TenantId,cancellationToken);
             if (endpoint is null) return Result.Failure(DomainErrors.WebhookEndpoint.NotFound);
 
             
