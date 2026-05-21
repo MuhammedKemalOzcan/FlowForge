@@ -81,6 +81,7 @@
             public static Error DeliveryNotFound => Error.NotFound("Delivery.DeliveryNotFound", "Delivery cannot be found!");
             public static Error NotInPendingState => Error.BadRequest("Delivery.NotInPendingState", "Webhooks that are not pending cannot be processed.");
             public static Error NotInQueuedState => Error.BadRequest("Delivery.NotInQueuedState", "Webhooks that are not queued cannot be processed.");
+            public static Error NotDeadLettered => Error.BadRequest("WebhookDelivery.NotDeadLettered", "Delivery is not in DeadLettered state.");
         }
     }
 }

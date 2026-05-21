@@ -24,7 +24,8 @@ namespace FlowForge.Application.Features.Queries.WebhookDeliveriesQuery
 
             var deliveries = await _context.WebhookDeliveries
                 .AsNoTracking()
-                .Where(x => x.TenantId == tenantId)
+                .Where(x => x.TenantId == tenantId
+                         && (request.EndpointId == null || x.EndpointId == request.EndpointId))
                 .Select(x => new WebhookDeliveryDto
                 {
                     Id = x.Id,

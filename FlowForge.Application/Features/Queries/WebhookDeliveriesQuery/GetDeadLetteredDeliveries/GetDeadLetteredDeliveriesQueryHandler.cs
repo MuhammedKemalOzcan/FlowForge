@@ -1,0 +1,65 @@
+using FlowForge.Application.Abstractions;
+using FlowForge.Application.Data;
+using FlowForge.Application.Dtos;
+using FlowForge.Domain.Enums;
+using FlowForge.Domain.Errors;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+
+namespace FlowForge.Application.Features.Queries.WebhookDeliveriesQuery.GetDeadLetteredDeliveries;
+
+public class GetDeadLetteredDeliveriesQueryHandler
+    : IRequestHandler<GetDeadLetteredDeliveriesQuery, Result<List<WebhookDeliveryDto>>>
+{
+    private readonly IFlowForgeApiDbContext _context;
+    private readonly ICurrentTenant _currentTenant;
+
+    public GetDeadLetteredDeliveriesQueryHandler(IFlowForgeApiDbContext context, ICurrentTenant currentTenant)
+    {
+        _context = context;
+        _currentTenant = currentTenant;
+    }
+
+    public async Task<Result<List<WebhookDeliveryDto>>> Handle(
+        GetDeadLetteredDeliveriesQuery request, CancellationToken cancellationToken)
+    {
+        var tenantId = _currentTenant.GetRequiredTenantId();
+
+        var deliveries = await _context.WebhookDeliveries
+            .AsNoTracking()
+            .Where(x => x.TenantId == tenantId && x.Status == DeliveryStatus.DeadLettered)
+            .Select(x => new WebhookDeliveryDto
+            {
+                Id           = x.Id,
+                EventType    = x.EventType.Value,
+                Payload      = x.Payload,
+                Status       = x.Status,
+                RetryPolicy  = new RetryPolicyDto
+                {
+                    MaxAttempts  = x.RetryPolicy.MaxAttempts,
+                    InitialDelay = x.RetryPolicy.InitialDelay,
+                    MaxDelay     = x.RetryPolicy.MaxDelay,
+                    Strategy     = x.RetryPolicy.Strategy,
+                    Timeout      = x.RetryPolicy.TimeOut
+                },
+                ReceivedAt       = x.ReceivedAt,
+                NextRetryAt      = x.NextRetryAt,
+                FinalResultAt    = x.FinalResultAt,
+                DeliveryAttempts = x.Attempts.Select(a => new DeliveryAttemptDto
+                {
+                    Id            = a.Id,
+                    AttemptNumber = a.AttemptNumber,
+                    StartedAt     = a.StartedAt,
+                    CompletedAt   = a.CompletedAt,
+                    DurationMs    = a.DurationMs,
+                    StatusCode    = a.StatusCode,
+                    ResponseBody  = a.ResponseBodySnippet,
+                    ErrorMessage  = a.ErrorMessage,
+                    OutcomeStatus = a.Outcome
+                }).ToList()
+            })
+            .ToListAsync(cancellationToken);
+
+        return Result<List<WebhookDeliveryDto>>.Success(deliveries);
+    }
+}
