@@ -1,4 +1,5 @@
-﻿using FlowForge.Application.Features.Commands.WebhookEndpoint.ChangeEndpointName;
+﻿using FlowForge.Application.Features.Commands.WebhookEndpoint.ActivateEndpoint;
+using FlowForge.Application.Features.Commands.WebhookEndpoint.ChangeEndpointName;
 using FlowForge.Application.Features.Commands.WebhookEndpoint.ChangeEndpointRetryPolicy;
 using FlowForge.Application.Features.Commands.WebhookEndpoint.ChangeEndpointSubscriptions;
 using FlowForge.Application.Features.Commands.WebhookEndpoint.ChangeEndpointUrl;
@@ -97,6 +98,15 @@ namespace FlowForge.API.Controllers
         [Authorize(AuthenticationSchemes = ApiKeyAuthenticationDefaults.AuthenticationScheme)]
         public async Task<IActionResult> RemoveEndpoint([FromRoute] RemoveEndpointCommand command)
         {
+            var result = await _mediator.Send(command);
+            return HandleResult(result);
+        }
+
+        [HttpPatch("{endpointId}/activate")]
+        [Authorize(AuthenticationSchemes = ApiKeyAuthenticationDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> ActivateEndpoint([FromRoute] Guid endpointId)
+        {
+            var command = new ActivateEndpointCommand(endpointId);
             var result = await _mediator.Send(command);
             return HandleResult(result);
         }
