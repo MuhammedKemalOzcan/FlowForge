@@ -1,6 +1,5 @@
 ﻿using FlowForge.Application.Abstractions;
 using FlowForge.Infrastructure.Authentication;
-using MassTransit.Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,12 +10,11 @@ namespace FlowForge.API.Controllers
     public class TestController : BaseApiController
     {
         private readonly ICurrentTenant _currentTenant;
-        private readonly IMediator _mediator;
 
-        public TestController(ICurrentTenant currentTenant, IMediator mediator)
+
+        public TestController(ICurrentTenant currentTenant)
         {
             _currentTenant = currentTenant;
-            _mediator = mediator;
         }
 
         [HttpGet]
@@ -28,6 +26,12 @@ namespace FlowForge.API.Controllers
                 tenantId = _currentTenant.TenantId,
                 apiKeyId = _currentTenant.ApiKeyId
             });
+        }
+
+        [HttpPost]
+        public Task<IActionResult> ex()
+        {
+            throw new Exception("test");
         }
 
         //public record ProcessDeliveryRequest(Guid TenantId);
