@@ -117,6 +117,17 @@ namespace FlowForge.Domain.Entities
             UpdatedAt = DateTime.UtcNow;
         }
 
+        public void RequeueFromDeadLetter()
+        {
+            if (Status != DeliveryStatus.DeadLettered)
+                throw new InvalidOperationException($"Cannot requeue from {Status} state. Only DeadLettered is allowed.");
+
+            Status = DeliveryStatus.Pending;
+            NextRetryAt = DateTime.UtcNow;
+            FinalResultAt = null;
+            UpdatedAt = DateTime.UtcNow;
+        }
+
         public void RecoverStuckToPending()
         {
             if (Status != DeliveryStatus.Queued && Status != DeliveryStatus.InProgress)
