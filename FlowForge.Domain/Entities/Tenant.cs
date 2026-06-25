@@ -11,6 +11,8 @@ namespace FlowForge.Domain.Entities
         public Plan Plan { get; private set; }
         public Status TenantStatus { get; private set; }
         public DateTime CreatedAt { get; private set; }
+        public bool IsDemo { get; private set; }
+        public DateTime? DemoExpiresAt { get; private set; }
         private readonly List<Membership> _memberships = new();
         public IReadOnlyCollection<Membership> Memberships => _memberships.AsReadOnly();
         public PlanLimits PlanLimits { get; private set; }
@@ -38,6 +40,17 @@ namespace FlowForge.Domain.Entities
             tenant._memberships.Add(membership);
 
             return Result<Tenant>.Success(tenant);
+        }
+
+        public static Result<Tenant> CreateDemo(string name, Guid userId)
+        {
+            var result = Create(name, userId);
+            if (!result.IsSuccess) return result;
+
+            result.Data!.IsDemo = true;
+            result.Data.DemoExpiresAt = DateTime.UtcNow.AddHours(24);
+
+            return result;
         }
 
         //Handler da downgrade durumlarında gerekli kontrolleri sağla (endpointler silinmeli üye sayısı düşürülmeli)

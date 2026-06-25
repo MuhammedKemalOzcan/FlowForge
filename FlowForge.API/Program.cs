@@ -20,6 +20,18 @@ namespace FlowForge.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowDashboard", policy =>
+                {
+                    policy.WithOrigins("http://localhost:3000")  // Next.js frontend
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials()
+                          .WithExposedHeaders("X-Correlation-Id");  // Frontend okuyabilsin
+                });
+            });
+
             // Add services to the container.
 
             builder.Services.AddControllers();
@@ -48,6 +60,7 @@ namespace FlowForge.API
 
             builder.Services.AddHostedService<DeliveryProcessorWorker>();
             builder.Services.AddHostedService<DeliveryRecoveryWorker>();
+            builder.Services.AddHostedService<DemoCleanupWorker>();
 
             builder.Services.AddScoped(typeof(IPipelineBehavior<,>),
                 typeof(LoggingPipelineBehavior<,>));
@@ -64,6 +77,8 @@ namespace FlowForge.API
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.UseCors("AllowDashboard");
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 

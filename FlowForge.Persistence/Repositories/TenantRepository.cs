@@ -26,6 +26,14 @@ namespace FlowForge.Persistence.Repositories
                  .FirstOrDefaultAsync(x => x.Id == tenantId);
         }
 
+        public async Task<IReadOnlyList<Tenant>> GetExpiredDemoTenantsAsync(DateTime cutoff, CancellationToken cancellationToken)
+        {
+            return await _context.Tenants
+                .Include(x => x.Memberships)
+                .Where(x => x.IsDemo && x.DemoExpiresAt <= cutoff)
+                .ToListAsync(cancellationToken);
+        }
+
         public void Remove(Tenant tenant)
         {
             _context.Remove(tenant);

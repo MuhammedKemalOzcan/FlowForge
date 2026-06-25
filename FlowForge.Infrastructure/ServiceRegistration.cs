@@ -3,6 +3,7 @@ using FlowForge.Application.Consumers;
 using FlowForge.Domain.Services;
 using FlowForge.Infrastructure.Authentication;
 using FlowForge.Infrastructure.Services;
+using FlowForge.Infrastructure.Streaming;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +25,9 @@ namespace FlowForge.Infrastructure
             //IConnectionMultiplexer Redis'e bağlantıyı yönetiyor — singleton olarak kayıt doğru çünkü tek bir bağlantı havuzu yönetir, her request'te yeni bağlantı açmaz.
             services.AddSingleton<IConnectionMultiplexer>(sp =>
             ConnectionMultiplexer.Connect(configuration["Redis:ConnectionString"]));
+
+            //SSE canlı akış hub'ı — tüm delivery olayları tek process içinde fan-out edildiği için singleton in-memory.
+            services.AddSingleton<IWebhookDeliveryStreamBroadcaster, InMemoryWebhookDeliveryStreamBroadcaster>();
 
             services.AddScoped<IRateLimiter, RedisRateLimiter>();
             services.AddHttpContextAccessor();
@@ -52,9 +56,8 @@ namespace FlowForge.Infrastructure
         {
             return HttpPolicyExtensions
                 .HandleTransientHttpError()
-                .OrResult(r => r.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-                .WaitAndRetryAsync(3, retryAttemprt =>
-                TimeSpan.FromSeconds(Math.Pow(2, retryAttemprt)) + TimeSpan.FromMilliseconds(Random.Shared.Next(0, 1000)),
+                .WaitAndRetryAsync(3, retryAttempt =>
+                TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)) + TimeSpan.FromMilliseconds(Random.Shared.Next(0, 1000)),
                 onRetry: (outcome, timespan, retryAttempt, context) =>
                 {
                     Console.WriteLine($"Polly Retry {retryAttempt} after {timespan.TotalSeconds:F1}s - Status: {outcome.Result?.StatusCode}");
