@@ -1,4 +1,5 @@
 using FlowForge.Application.Abstractions;
+using FlowForge.Application.Streaming;
 using FlowForge.Domain.Enums;
 using FlowForge.Domain.Errors;
 using FlowForge.Domain.Repositories;
@@ -11,15 +12,18 @@ public class RequeueDeadLetteredDeliveryCommandHandler : IRequestHandler<Requeue
     private readonly IWebhookDeliveryRepository _deliveryRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentTenant _currentTenant;
+    private readonly IWebhookDeliveryStreamBroadcaster _streamBroadcaster;
 
     public RequeueDeadLetteredDeliveryCommandHandler(
         IWebhookDeliveryRepository deliveryRepository,
         IUnitOfWork unitOfWork,
-        ICurrentTenant currentTenant)
+        ICurrentTenant currentTenant,
+        IWebhookDeliveryStreamBroadcaster streamBroadcaster)
     {
         _deliveryRepository = deliveryRepository;
         _unitOfWork = unitOfWork;
         _currentTenant = currentTenant;
+        _streamBroadcaster = streamBroadcaster;
     }
 
     public async Task<Result> Handle(RequeueDeadLetteredDeliveryCommand request, CancellationToken cancellationToken)
@@ -36,6 +40,8 @@ public class RequeueDeadLetteredDeliveryCommandHandler : IRequestHandler<Requeue
         delivery.RequeueFromDeadLetter();
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        await _streamBroadcaster.PublishAsync(WebhookDeliveryStreamEvent.From(delivery, "requeued"), cancellationToken);
 
         return Result.Success();
     }

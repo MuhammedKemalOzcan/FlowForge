@@ -19,6 +19,7 @@ namespace FlowForge.Persistence
             });
 
             services.AddScoped<ITenantRepository, TenantRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<FlowForgeAPIDbContext>());
             services.AddScoped<IFlowForgeApiDbContext>(provider => provider.GetRequiredService<FlowForgeAPIDbContext>());
             services.AddScoped<IWebhookEndpointRepository, WebhookEndpointRepository>();

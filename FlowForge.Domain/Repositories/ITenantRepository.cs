@@ -6,6 +6,8 @@ namespace FlowForge.Domain.Repositories
     {
         Task<Tenant?> GetById(Guid tenantId);
 
+        Task<IReadOnlyList<Tenant>> GetExpiredDemoTenantsAsync(DateTime cutoff, CancellationToken cancellationToken);
+
         void Add(Tenant tenant);
 
         void Update(Tenant tenant);

@@ -1,4 +1,6 @@
-﻿using FlowForge.Application.Messages;
+﻿using FlowForge.Application.Abstractions;
+using FlowForge.Application.Messages;
+using FlowForge.Application.Streaming;
 using FlowForge.Domain.Repositories;
 using MassTransit;
 
@@ -27,6 +29,7 @@ namespace FlowForge.API.BackgroundServices
                         var repo = scope.ServiceProvider.GetRequiredService<IWebhookDeliveryRepository>();
                         var publishEndpoint = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
                         var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                        var streamBroadcaster = scope.ServiceProvider.GetRequiredService<IWebhookDeliveryStreamBroadcaster>();
 
                         var deliveries = await repo.GetPendingDeliveriesAsync(stoppingToken);
                         _logger.LogInformation("Found {count} pending deliveries.",deliveries.Count);
@@ -46,6 +49,7 @@ namespace FlowForge.API.BackgroundServices
                                         new ProcessWebhookDeliveryMessage(delivery.Id, delivery.TenantId),
                                         ctx => ctx.CorrelationId = correlationId,  // ← Aynı ID
                                         stoppingToken);
+                                    await streamBroadcaster.PublishAsync(WebhookDeliveryStreamEvent.From(delivery, "queued"), stoppingToken);
                                 }
                                 catch (Exception ex)
                                 {

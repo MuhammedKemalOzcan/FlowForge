@@ -25,6 +25,12 @@ namespace FlowForge.Persistence.Configurations
             builder.Property(x => x.CreatedAt)
                 .IsRequired();
 
+            builder.Property(x => x.IsDemo)
+                .IsRequired();
+
+            builder.Property(x => x.DemoExpiresAt)
+                .IsRequired(false);
+
             builder.HasMany(x => x.Memberships)
                 .WithOne()
                 .HasForeignKey("TenantId"); //shadow property -> Db'de kolon var ama entity içerisinde yok

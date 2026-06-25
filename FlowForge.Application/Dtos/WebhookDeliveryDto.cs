@@ -9,6 +9,8 @@ namespace FlowForge.Application.Dtos
         public string Payload { get; set; }
         public DeliveryStatus Status { get; set; }
         public RetryPolicyDto RetryPolicy { get; set; }
+        public string EndpointName { get; set; }
+
         public DateTime ReceivedAt { get; set; }
         public DateTime? NextRetryAt { get; set; }
         public DateTime? FinalResultAt { get; set; }

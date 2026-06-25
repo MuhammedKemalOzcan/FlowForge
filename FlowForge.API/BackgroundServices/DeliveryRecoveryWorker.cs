@@ -1,4 +1,7 @@
-﻿using FlowForge.Domain.Repositories;
+﻿using FlowForge.Application.Abstractions;
+using FlowForge.Application.Streaming;
+using FlowForge.Domain.Entities;
+using FlowForge.Domain.Repositories;
 
 namespace FlowForge.API.BackgroundServices
 {
@@ -53,6 +56,7 @@ namespace FlowForge.API.BackgroundServices
                 _logger.LogInformation("Recovery cycle Started.");
                 var repo = scope.ServiceProvider.GetRequiredService<IWebhookDeliveryRepository>();
                 var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var streamBroadcaster = scope.ServiceProvider.GetRequiredService<IWebhookDeliveryStreamBroadcaster>();
 
                 var now = DateTime.UtcNow;
                 var queuedThreshold = now - QueuedTimeout;
@@ -65,6 +69,7 @@ namespace FlowForge.API.BackgroundServices
                 _logger.LogInformation("Found {count} in progress deliveries.", inProgressDeliveries.Count);
 
                 var hasChanges = false;
+                var recovered = new List<WebhookDelivery>();
 
                 foreach (var queued in queuedDeliveries)
                 {
@@ -72,6 +77,7 @@ namespace FlowForge.API.BackgroundServices
                     {
                         queued.RecoverStuckToPending();
                         hasChanges = true;
+                        recovered.Add(queued);
                         _logger.LogInformation(
                         "Recovered stuck delivery {DeliveryId} from Queued to Pending",
                         queued.Id);
@@ -91,6 +97,7 @@ namespace FlowForge.API.BackgroundServices
                     {
                         inProgress.RecoverStuckToPending();
                         hasChanges = true;
+                        recovered.Add(inProgress);
                         _logger.LogInformation(
                         "Recovered stuck delivery {DeliveryId} from Queued to Pending",
                         inProgress.Id);
@@ -109,6 +116,11 @@ namespace FlowForge.API.BackgroundServices
                 if (hasChanges)
                 {
                     await unitOfWork.SaveChangesAsync(cancellationToken);
+
+                    foreach (var delivery in recovered)
+                    {
+                        await streamBroadcaster.PublishAsync(WebhookDeliveryStreamEvent.From(delivery, "recovered"), cancellationToken);
+                    }
                 }
             }
         }

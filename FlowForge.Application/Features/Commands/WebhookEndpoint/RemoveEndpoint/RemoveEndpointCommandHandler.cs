@@ -1,4 +1,4 @@
-﻿using FlowForge.Application.Abstractions;
+﻿ using FlowForge.Application.Abstractions;
 using FlowForge.Domain.Errors;
 using FlowForge.Domain.Repositories;
 using MediatR;
@@ -22,7 +22,7 @@ namespace FlowForge.Application.Features.Commands.WebhookEndpoint.RemoveEndpoint
         {
             var tenantId = _currentTenant.GetRequiredTenantId();
 
-            var endpoint = await _endpointRepository.GetByIdAsync(request.Id, tenantId, cancellationToken);
+            var endpoint = await _endpointRepository.GetByIdAsync(request.endpointId, tenantId, cancellationToken);
 
             if (endpoint is null) return Result.Failure(DomainErrors.WebhookEndpoint.NotFound);
 

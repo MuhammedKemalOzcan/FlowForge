@@ -22,41 +22,49 @@ namespace FlowForge.Application.Features.Queries.WebhookDeliveriesQuery
         {
             var tenantId = _currentTenant.GetRequiredTenantId();
 
-            var deliveries = await _context.WebhookDeliveries
-                .AsNoTracking()
-                .Where(x => x.TenantId == tenantId
-                         && (request.EndpointId == null || x.EndpointId == request.EndpointId))
-                .Select(x => new WebhookDeliveryDto
-                {
-                    Id = x.Id,
-                    EventType = x.EventType.Value,
-                    Payload = x.Payload,
-                    Status = x.Status,
-                    RetryPolicy = new RetryPolicyDto
-                    {
-                        MaxAttempts = x.RetryPolicy.MaxAttempts,
-                        InitialDelay = x.RetryPolicy.InitialDelay,
-                        MaxDelay = x.RetryPolicy.MaxDelay,
-                        Strategy = x.RetryPolicy.Strategy,
-                        Timeout = x.RetryPolicy.TimeOut
-                    },
-                    ReceivedAt = x.ReceivedAt,
-                    NextRetryAt = x.NextRetryAt,
-                    FinalResultAt = x.FinalResultAt,
-                    DeliveryAttempts = x.Attempts.Select(a => new DeliveryAttemptDto
-                    {
-                        Id = a.Id,
-                        AttemptNumber = a.AttemptNumber,
-                        StartedAt = a.StartedAt,
-                        CompletedAt = a.CompletedAt,
-                        DurationMs = a.DurationMs,
-                        StatusCode = a.StatusCode,
-                        ResponseBody = a.ResponseBodySnippet,
-                        ErrorMessage = a.ErrorMessage,
-                        OutcomeStatus = a.Outcome
-                    })
-                    .ToList()
-                }).ToListAsync(cancellationToken);
+            var deliveries = await (
+             from delivery in _context.WebhookDeliveries.AsNoTracking()
+             join endpoint in _context.WebhookEndpoints.AsNoTracking()
+                 on delivery.EndpointId equals endpoint.Id
+             where delivery.TenantId == tenantId
+                && endpoint.TenantId == tenantId
+                && (request.EndpointId == null || delivery.EndpointId == request.EndpointId)
+             select new WebhookDeliveryDto
+             {
+                 Id = delivery.Id,
+                 EndpointName = endpoint.Name.Value,
+                 EventType = delivery.EventType.Value,
+                 Payload = delivery.Payload,
+                 Status = delivery.Status,
+                 RetryPolicy = new RetryPolicyDto
+                 {
+                     MaxAttempts = delivery.RetryPolicy.MaxAttempts,
+                     InitialDelay = delivery.RetryPolicy.InitialDelay,
+                     MaxDelay = delivery.RetryPolicy.MaxDelay,
+                     Strategy = delivery.RetryPolicy.Strategy,
+                     Timeout = delivery.RetryPolicy.TimeOut
+                 },
+
+                 ReceivedAt = delivery.ReceivedAt,
+                 NextRetryAt = delivery.NextRetryAt,
+                 FinalResultAt = delivery.FinalResultAt,
+
+                 DeliveryAttempts = delivery.Attempts
+             .OrderBy(a => a.AttemptNumber)
+             .Select(a => new DeliveryAttemptDto
+             {
+                 Id = a.Id,
+                 AttemptNumber = a.AttemptNumber,
+                 StartedAt = a.StartedAt,
+                 CompletedAt = a.CompletedAt,
+                 DurationMs = a.DurationMs,
+                 StatusCode = a.StatusCode,
+                 ResponseBody = a.ResponseBodySnippet,
+                 ErrorMessage = a.ErrorMessage,
+                 OutcomeStatus = a.Outcome
+             })
+             .ToList()
+             }).ToListAsync(cancellationToken);
 
             return Result<List<WebhookDeliveryDto>>.Success(deliveries);
         }
