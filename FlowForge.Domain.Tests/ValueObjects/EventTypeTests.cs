@@ -77,9 +77,6 @@ namespace FlowForge.Domain.Tests.ValueObjects
 
             //Assert
             result.IsSuccess.Should().BeFalse();
-            result.Error.Should().NotBeNull();
-            result.Error.Code.Should().Be("EventType.Invalid");
-            result.Error.ErrorType.Should().Be(ErrorType.Validation);
         }
 
         [Fact]

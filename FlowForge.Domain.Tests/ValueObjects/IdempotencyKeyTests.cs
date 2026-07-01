@@ -1,4 +1,5 @@
-﻿using FlowForge.Domain.ValueObjects;
+﻿using FlowForge.Domain.Errors;
+using FlowForge.Domain.ValueObjects;
 using FluentAssertions;
 
 namespace FlowForge.Domain.Tests.ValueObjects
@@ -43,10 +44,11 @@ namespace FlowForge.Domain.Tests.ValueObjects
         public void Create_WithNullOrWhitespaceKey_ReturnsFailureResult(string validKeys)
         {
             //Act
-            Action act = () => IdempotencyKey.Create(validKeys);
+            var result = IdempotencyKey.Create(validKeys);
 
             //Assert
-            act.Should().Throw<ArgumentException>().WithMessage("*empty*");
+            result.IsSuccess.Should().BeFalse();
+            result.Error.Should().Be(DomainErrors.IdempotencyKey.Empty);
         }
 
         [Fact]
@@ -56,10 +58,11 @@ namespace FlowForge.Domain.Tests.ValueObjects
             var input = new string('a', 256);
 
             //Act
-            Action act = () => IdempotencyKey.Create(input);
+            var result = IdempotencyKey.Create(input);
 
             //Assert
-            act.Should().Throw<ArgumentException>().WithMessage("*between*");
+            result.IsSuccess.Should().BeFalse();
+            result.Error.Should().Be(DomainErrors.IdempotencyKey.InvalidLength);
         }
 
         [Fact]
@@ -83,10 +86,11 @@ namespace FlowForge.Domain.Tests.ValueObjects
         public void Create_WithNonAsciiCharacters_ReturnsFailureResult(string invalidInputs)
         {
             //Act
-            Action act = () => IdempotencyKey.Create(invalidInputs);
+            var result = IdempotencyKey.Create(invalidInputs);
 
             //ASsert
-            act.Should().Throw<ArgumentException>();
+            result.IsSuccess.Should().BeFalse();
+            result.Error.Should().Be(DomainErrors.IdempotencyKey.InvalidFormat);
         }
 
         [Theory]
@@ -116,7 +120,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
             var key2 = IdempotencyKey.Create(input2);
 
             //Arrange
-            key1.Should().Be(key2);
+            key1.Data.Should().Be(key2.Data);
         }
     }
 }

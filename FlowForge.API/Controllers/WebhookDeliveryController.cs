@@ -98,7 +98,7 @@ namespace FlowForge.API.Controllers
             Response.Headers["Content-Type"] = "text/event-stream";
             Response.Headers["Cache-Control"] = "no-cache";
             Response.Headers["Connection"] = "keep-alive";
-            Response.Headers["X-Accel-Buffering"] = "no"; // disable proxy buffering
+            Response.Headers["X-Accel-Buffering"] = "no"; // disable proxy buffering: Bu akışı tamponlama,anında geçir.
 
             HttpContext.Features.Get<IHttpResponseBodyFeature>()?.DisableBuffering();
 

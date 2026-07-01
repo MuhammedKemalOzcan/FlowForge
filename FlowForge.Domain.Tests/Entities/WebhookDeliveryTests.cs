@@ -158,6 +158,7 @@ namespace FlowForge.Domain.Tests.Entities
         {
             //Arrange
             var delivery = CreateValidDelivery();
+            delivery.MarkQueued();
 
             //Act
             delivery.MarkInProgress();
@@ -173,6 +174,7 @@ namespace FlowForge.Domain.Tests.Entities
             var delivery = CreateValidDelivery();
             for (int i = 0; i < 5; i++)
             {
+                delivery.MarkQueued();
                 delivery.MarkInProgress();
                 delivery.RecordFailedAttempt(150, System.Net.HttpStatusCode.InternalServerError, "Server Error", DateTime.UtcNow.AddMilliseconds(-150), DateTime.UtcNow);
             }
@@ -190,6 +192,7 @@ namespace FlowForge.Domain.Tests.Entities
         {
             //Arrange
             var delivery = CreateValidDelivery();
+            delivery.MarkQueued();
             delivery.MarkInProgress();
 
             //Act
@@ -204,6 +207,7 @@ namespace FlowForge.Domain.Tests.Entities
         {
             //Arrange
             var delivery = CreateValidDelivery();
+            delivery.MarkQueued();
             delivery.MarkInProgress();
             delivery.RecordSuccessfulAttempt(150, System.Net.HttpStatusCode.OK, "OK", DateTime.UtcNow.AddMilliseconds(-150), DateTime.UtcNow);
 
@@ -221,6 +225,7 @@ namespace FlowForge.Domain.Tests.Entities
         {
             //Arrange
             var delivery = CreateValidDelivery();
+            delivery.MarkQueued();
             delivery.MarkInProgress();
             delivery.RecordSuccessfulAttempt(150, System.Net.HttpStatusCode.OK, "OK", DateTime.UtcNow.AddMilliseconds(-150), DateTime.UtcNow);
 
@@ -238,6 +243,7 @@ namespace FlowForge.Domain.Tests.Entities
             var delivery = CreateValidDelivery();
             for (int i = 0; i < 5; i++)
             {
+                delivery.MarkQueued();
                 delivery.MarkInProgress();
                 delivery.RecordFailedAttempt(150, System.Net.HttpStatusCode.BadRequest, "Test", DateTime.UtcNow.AddMilliseconds(-150), DateTime.UtcNow);
             }
@@ -254,6 +260,7 @@ namespace FlowForge.Domain.Tests.Entities
         {
             //Arrange
             var delivery = CreateValidDelivery();
+            delivery.MarkQueued();
             delivery.MarkInProgress();
 
             //Act
@@ -270,6 +277,7 @@ namespace FlowForge.Domain.Tests.Entities
         {
             //Arrange
             var delivery = CreateValidDelivery();
+            delivery.MarkQueued();
             delivery.MarkInProgress();
 
             //Act
@@ -300,6 +308,7 @@ namespace FlowForge.Domain.Tests.Entities
             //Arrange
             var delivery = CreateValidDelivery();
             var longResponse = new string('A', 1000);
+            delivery.MarkQueued();
             delivery.MarkInProgress();
 
             //Act
@@ -333,11 +342,13 @@ namespace FlowForge.Domain.Tests.Entities
 
             for (int i = 0; i < 4; i++)
             {
+                delivery.MarkQueued();
                 delivery.MarkInProgress();
                 delivery.RecordFailedAttempt(150, System.Net.HttpStatusCode.InternalServerError, "Server Error", DateTime.UtcNow.AddMilliseconds(-150), DateTime.UtcNow);
             }
 
             //Son aşama
+            delivery.MarkQueued();
             delivery.MarkInProgress();
 
             //Act
@@ -356,6 +367,7 @@ namespace FlowForge.Domain.Tests.Entities
         {
             //Arrange
             var delivery = CreateValidDelivery();
+            delivery.MarkQueued();
             delivery.MarkInProgress();
 
             //Act
@@ -374,6 +386,7 @@ namespace FlowForge.Domain.Tests.Entities
         {
             //Arrange
             var delivery = CreateValidDelivery();
+            delivery.MarkQueued();
             delivery.MarkInProgress();
             var expectedDelay = delivery.RetryPolicy.CalculateDelayFor(1);
             var beforeAttempt = DateTime.UtcNow;
@@ -397,6 +410,7 @@ namespace FlowForge.Domain.Tests.Entities
             //Act
             for (int i = 0; i < 3; i++)
             {
+                delivery.MarkQueued();
                 delivery.MarkInProgress();
                 delivery.RecordFailedAttempt(150, System.Net.HttpStatusCode.InternalServerError, "Server Error", DateTime.UtcNow.AddMilliseconds(-150), DateTime.UtcNow);
             }
@@ -410,6 +424,7 @@ namespace FlowForge.Domain.Tests.Entities
         {
             //Arrange
             var delivery = CreateValidDelivery();
+            delivery.MarkQueued();
             delivery.MarkInProgress();
 
             //Act
@@ -423,6 +438,7 @@ namespace FlowForge.Domain.Tests.Entities
         {
             //Arrange
             var delivery = CreateValidDelivery();
+            delivery.MarkQueued();
             delivery.MarkInProgress();
 
             //Act

@@ -11,6 +11,35 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USERNAME} -d flowforge"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: . # Kök dizinden çalıştırıyoruz ki diğer katmanları bulabilsin
+      dockerfile: FlowForge.API/Dockerfile
+    container_name: flowforge_api
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      # Sihirli Dokunuş: Appsettings'i eziyoruz ve localhost yerine 'postgres-db' diyoruz!
+      ConnectionStrings__DefaultConnection: "Host=postgres-db;Port=5432;Database=flowforge;Username=${POSTGRES_USERNAME};Password=${POSTGRES_PASSWORD}"
+      Redis__ConnectionString: "redis:6379"
+      RabbitMQ__HostName: "rabbitmq" 
+      RabbitMQ__UserName: "${RABBITMQ_USER}"
+      RabbitMQ__Password: "${RABBITMQ_PASSWORD}"
+      ASPNETCORE_ENVIRONMENT: Production
+    restart: unless-stopped
 
   rabbitmq:
     image: rabbitmq:3.13-management
@@ -24,6 +53,12 @@ services:
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      
 
   redis:
     image: redis:8
@@ -33,6 +68,11 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
 volumes:
   postgres_data:

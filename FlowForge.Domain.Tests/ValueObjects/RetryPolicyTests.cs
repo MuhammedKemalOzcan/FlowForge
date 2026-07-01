@@ -1,4 +1,5 @@
 ﻿using FlowForge.Domain.Enums;
+using FlowForge.Domain.Errors;
 using FlowForge.Domain.ValueObjects;
 using FluentAssertions;
 
@@ -35,7 +36,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
         public void Constructor_WithInvalidMaxAttempt_ReturnsFailureResult(int invalidMaxAttempts)
         {
             //Act
-            Action act = () => RetryPolicy.Create(
+            var result = RetryPolicy.Create(
                 invalidMaxAttempts,
                 Enums.BackoffStrategy.Exponential,
                 TimeSpan.FromSeconds(1),
@@ -44,7 +45,8 @@ namespace FlowForge.Domain.Tests.ValueObjects
                 );
 
             //Assert
-            act.Should().Throw<ArgumentException>().WithMessage("*max attempts*");
+            result.IsSuccess.Should().BeFalse();
+            result.Error.Should().Be(DomainErrors.RetryPolicy.InvalidMaxAttemptRange);
         }
 
         [Theory]
@@ -70,7 +72,7 @@ namespace FlowForge.Domain.Tests.ValueObjects
         public void Constructor_WithNegativeInitialDelay_ReturnsFailureResult()
         {
             //Arrange & Act
-            Action act = () => RetryPolicy.Create(
+            var result = RetryPolicy.Create(
                 5,
                 Enums.BackoffStrategy.Exponential,
                 TimeSpan.FromSeconds(-1),
@@ -79,14 +81,15 @@ namespace FlowForge.Domain.Tests.ValueObjects
                 );
 
             //Assert
-            act.Should().Throw<ArgumentException>();
+            result.IsSuccess.Should().BeFalse();
+            result.Error.Should().Be(DomainErrors.RetryPolicy.NegativeInitialDelay);
         }
 
         [Fact]
         public void Constructor_WithMaxDelayLessThanInitialDelay_ReturnsFailureResult()
         {
             //Arrange & Act
-            Action act = () => RetryPolicy.Create(
+            var result = RetryPolicy.Create(
                 5,
                 BackoffStrategy.Exponential,
                 TimeSpan.FromMinutes(2),
@@ -95,14 +98,15 @@ namespace FlowForge.Domain.Tests.ValueObjects
                 );
 
             //Assert
-            act.Should().Throw<ArgumentException>();
+            result.IsSuccess.Should().BeFalse();
+            result.Error.Should().Be(DomainErrors.RetryPolicy.InvalidDelayRange);
         }
 
         [Fact]
         public void Constructor_WithNegativeTimeout_ReturnsFailureResult()
         {
             //Arrange & Act
-            Action act = () => RetryPolicy.Create(
+            var result = RetryPolicy.Create(
                 5,
                 Enums.BackoffStrategy.Exponential,
                 TimeSpan.FromSeconds(1),
@@ -111,7 +115,8 @@ namespace FlowForge.Domain.Tests.ValueObjects
                 );
 
             //Assert
-            act.Should().Throw<ArgumentException>();
+            result.IsSuccess.Should().BeFalse();
+            result.Error.Should().Be(DomainErrors.RetryPolicy.NegativeTimeout);
         }
 
         //DefaultFactory Test:

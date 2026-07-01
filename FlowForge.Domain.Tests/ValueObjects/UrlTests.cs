@@ -1,4 +1,5 @@
-﻿using FlowForge.Domain.ValueObjects;
+﻿using FlowForge.Domain.Errors;
+using FlowForge.Domain.ValueObjects;
 using FluentAssertions;
 
 namespace FlowForge.Domain.Tests.ValueObjects
@@ -39,10 +40,11 @@ namespace FlowForge.Domain.Tests.ValueObjects
         public void Constructor_WithNullUrl_ReturnsFailureResult()
         {
             //Act
-            Action act = () => Url.Create(null!);
+            var result = Url.Create(null!);
 
             //Assert
-            act.Should().Throw<ArgumentException>().WithMessage("*empty*");
+            result.IsSuccess.Should().BeFalse();
+            result.Error.Should().Be(DomainErrors.Url.Empty);
         }
 
         [Theory]
@@ -53,10 +55,10 @@ namespace FlowForge.Domain.Tests.ValueObjects
         public void Constructor_WithEmptyUrl_ReturnsFailureResult(string invalidUrl)
         {
             //Act
-            Action act = () => Url.Create(invalidUrl);
+            var result = Url.Create(invalidUrl);
 
             //Assert
-            act.Should().Throw<ArgumentException>();
+            result.IsSuccess.Should().BeFalse();
         }
 
         [Theory]
@@ -67,10 +69,10 @@ namespace FlowForge.Domain.Tests.ValueObjects
         public void Constructor_WithMalformedUrl_ReturnsFailureResult(string invalidUrl)
         {
             //Act
-            Action act = () => Url.Create(invalidUrl);
+            var result = Url.Create(invalidUrl);
 
             //Assert
-            act.Should().Throw<ArgumentException>();
+            result.IsSuccess.Should().BeFalse();
         }
 
         [Theory]
@@ -80,10 +82,10 @@ namespace FlowForge.Domain.Tests.ValueObjects
         public void Constructor_WithRelativeUrl_ReturnsFailureResult(string relativeUrl)
         {
             // Act
-            Action act = () => Url.Create(relativeUrl);
+            var result = Url.Create(relativeUrl);
 
             // Assert
-            act.Should().Throw<ArgumentException>();
+            result.IsSuccess.Should().BeFalse();
         }
 
         [Fact]
@@ -93,10 +95,11 @@ namespace FlowForge.Domain.Tests.ValueObjects
             var httpUrl = "http://example.com/test";
 
             //Act
-            Action act = () => Url.Create(httpUrl);
+            var result = Url.Create(httpUrl);
 
             //Assert
-            act.Should().Throw<ArgumentException>().WithMessage("*HTTPS*");
+            result.IsSuccess.Should().BeFalse();
+            result.Error.Should().Be(DomainErrors.Url.InvalidScheme);
         }
 
         [Theory]
@@ -110,10 +113,11 @@ namespace FlowForge.Domain.Tests.ValueObjects
         public void Constructor_WithNonHttpsScheme_ReturnsFailureResult(string url)
         {
             // Act
-            Action act = () => Url.Create(url);
+            var result = Url.Create(url);
 
             // Assert
-            act.Should().Throw<ArgumentException>();
+            result.IsSuccess.Should().BeFalse();
+            result.Error.Should().Be(DomainErrors.Url.InvalidScheme);
         }
 
         [Theory]
@@ -123,10 +127,11 @@ namespace FlowForge.Domain.Tests.ValueObjects
         public void Constructor_WithLocalhostHostname_ReturnsFailureResult(string localhostUrl)
         {
             // Act
-            Action act = () => Url.Create(localhostUrl);
+            var result = Url.Create(localhostUrl);
 
             // Assert
-            act.Should().Throw<ArgumentException>();
+            result.IsSuccess.Should().BeFalse();
+            result.Error.Should().Be(DomainErrors.Url.LocalUrl);
         }
 
         [Theory]
@@ -137,10 +142,11 @@ namespace FlowForge.Domain.Tests.ValueObjects
         public void Constructor_WithIPv4LocalhostRange_ReturnsFailureResult(string localhostUrl)
         {
             // Act
-            Action act = () => Url.Create(localhostUrl);
+            var result = Url.Create(localhostUrl);
 
             // Assert
-            act.Should().Throw<ArgumentException>();
+            result.IsSuccess.Should().BeFalse();
+            result.Error.Should().Be(DomainErrors.Url.LocalUrl);
         }
 
         [Theory]
@@ -154,10 +160,11 @@ namespace FlowForge.Domain.Tests.ValueObjects
         public void Constructor_WithPrivateIpAddress_ReturnsFailureResult(string privateIpUrl)
         {
             // Act
-            Action act = () => Url.Create(privateIpUrl);
+            var result = Url.Create(privateIpUrl);
 
             // Assert
-            act.Should().Throw<ArgumentException>();
+            result.IsSuccess.Should().BeFalse();
+            result.Error.Should().Be(DomainErrors.Url.LocalUrl);
         }
 
         [Theory]
@@ -180,10 +187,11 @@ namespace FlowForge.Domain.Tests.ValueObjects
         public void Constructor_WithAwsMetadataIp_ReturnsFailureResult(string metadataUrl)
         {
             // Act
-            Action act = () => Url.Create(metadataUrl);
+            var result = Url.Create(metadataUrl);
 
             // Assert
-            act.Should().Throw<ArgumentException>();
+            result.IsSuccess.Should().BeFalse();
+            result.Error.Should().Be(DomainErrors.Url.LocalUrl);
         }
 
         [Theory]
@@ -192,10 +200,11 @@ namespace FlowForge.Domain.Tests.ValueObjects
         public void Constructor_WithUnspecifiedAddress_ReturnsFailureResult(string url)
         {
             // Act
-            Action act = () => Url.Create(url);
+            var result = Url.Create(url);
 
             // Assert
-            act.Should().Throw<ArgumentException>();
+            result.IsSuccess.Should().BeFalse();
+            result.Error.Should().Be(DomainErrors.Url.LocalUrl);
         }
 
         [Fact]
@@ -205,10 +214,11 @@ namespace FlowForge.Domain.Tests.ValueObjects
             var localhostUrl = "https://localhost/webhook";
 
             // Act
-            Action act = () => Url.Create(localhostUrl);
+            var result = Url.Create(localhostUrl);
 
             // Assert
-            act.Should().Throw<ArgumentException>();
+            result.IsSuccess.Should().BeFalse();
+            result.Error.Should().Be(DomainErrors.Url.LocalUrl);
         }
     }
 }
